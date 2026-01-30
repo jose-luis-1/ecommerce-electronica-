@@ -1,0 +1,20 @@
+export const validateEmail = (email: string): boolean => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
+export const validatePassword = (password: string): { valid: boolean; message?: string } => {
+  if (password.length < 6) {
+    return { valid: false, message: 'La contraseña debe tener al menos 6 caracteres' };
+  }
+  return { valid: true };
+};
+
+export const validatePhone = (phone: string): boolean => {
+  const regex = /^[0-9]{10}$/;
+  return regex.test(phone.replace(/\s/g, ''));
+};
+
+export const validateRequired = (value: string): boolean => {
+  return value.trim().length > 0;
+};
