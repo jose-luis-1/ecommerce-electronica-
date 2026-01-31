@@ -1,6 +1,6 @@
 import { useState, useEffect, type ChangeEvent } from 'react';
 import type { Product } from '../services/supabase';
-import { ProductGrid } from '../components/product/ProductGrid';
+// BORRAMOS EL IMPORT DE PRODUCTGRID QUE DABA ERROR
 import { Loading } from '../components/common/Loading';
 import { CATEGORIES } from '../utils/constants';
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
@@ -119,15 +119,19 @@ export const Products = () => {
   const allCategories = ['Todos', ...CATEGORIES.filter(c => c !== 'Todos')];
 
   return (
+    // NOTA: Si ves que el menú de arriba te tapa el contenido, 
+    // cambia 'pt-0' por 'pt-24' o más en la siguiente línea.
     <div className="min-h-screen bg-slate-950 text-slate-200">
       
       {/* HEADER DE LA SECCIÓN */}
+      {/* top-0 funciona bien si NO tienes un Navbar fijo encima. 
+          Si tienes navbar fijo, cambia 'top-0' por 'top-20' */}
       <div className="bg-slate-900/50 border-b border-slate-800 backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <p className="text-slate-400 text-sm">
-                 {filteredProducts.length} 
+                 {filteredProducts.length}
               </p>
             </div>
 
@@ -160,8 +164,9 @@ export const Products = () => {
                 </button>
               </div>
 
+              {/* Ajustar 'top-24' si el header de arriba cambia de altura */}
               <div className="sticky top-24 space-y-8">
-                {/* BÚSQUEDA - AHORA PRIMERO */}
+                {/* BÚSQUEDA */}
                 <div>
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
                     Buscar
@@ -185,7 +190,7 @@ export const Products = () => {
                   </div>
                 </div>
 
-                {/* CATEGORÍAS - AHORA SEGUNDO */}
+                {/* CATEGORÍAS */}
                 <div className="pt-6 border-t border-slate-800">
                   <h3 className="flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
                     <Filter className="h-4 w-4" /> Categorías

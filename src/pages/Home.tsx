@@ -103,7 +103,7 @@ export const Home = () => {
             <Link to="/products">
               <Button 
                 size="lg" 
-                className="group h-14 px-8 rounded-full bg-white text-slate-950 font-bold hover:bg-slate-200 transition-all shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_-15px_rgba(255,255,255,0.4)] flex items-center gap-2"
+                className="group h-14 px-8 rounded-full border-slate-700 text-white hover:bg-slate-800 transition-all shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_-15px_rgba(255,255,255,0.4)] flex items-center gap-2"
               >
                 <ShoppingBag className="w-5 h-5" />
                 Comprar Ahora
