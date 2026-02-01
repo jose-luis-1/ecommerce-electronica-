@@ -8,7 +8,7 @@ import { useAdmin } from '../../context/AdminContext';
 // Iconos Premium
 import { 
   ShoppingBag, Menu, X, User, 
-  LogOut, Zap, LayoutGrid 
+  LogOut, Zap, LayoutGrid, ShieldCheck
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -27,12 +27,6 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  {isAdmin && (
-  <Link to="/admin" className="text-gray-700 hover:text-primary-600">
-    Admin
-  </Link>
-)}
 
   // Cerrar menú móvil al cambiar de ruta
   useEffect(() => {
@@ -63,8 +57,10 @@ export const Navbar = () => {
           {/* 2. MENÚ DESKTOP (Centro) */}
           <div className="hidden md:flex items-center space-x-8">
             <NavLink to="/" current={location.pathname === '/'}>Inicio</NavLink>
-            <NavLink to="/products" current={location.pathname === '/products'}>Catálogo</NavLink>
-            {/* Puedes agregar más links aquí */}
+            <NavLink to="/products" current={location.pathname.startsWith('/products')}>Catálogo</NavLink>
+            {isAdmin && (
+              <NavLink to="/admin" current={location.pathname.startsWith('/admin')}>Admin</NavLink>
+            )}
           </div>
 
           {/* 3. ACCIONES (Derecha) */}
@@ -144,6 +140,9 @@ export const Navbar = () => {
           <div className="px-4 py-6 space-y-4">
             <MobileNavLink to="/" icon={LayoutGrid}>Inicio</MobileNavLink>
             <MobileNavLink to="/products" icon={ShoppingBag}>Productos</MobileNavLink>
+            {isAdmin && (
+              <MobileNavLink to="/admin" icon={ShieldCheck}>Admin Panel</MobileNavLink>
+            )}
             
             <div className="border-t border-slate-800 my-4 pt-4">
               {user ? (
