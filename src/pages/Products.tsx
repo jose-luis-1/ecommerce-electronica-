@@ -1,9 +1,9 @@
 import { useState, useEffect, type ChangeEvent } from 'react';
 import type { Product } from '../services/supabase';
-// BORRAMOS EL IMPORT DE PRODUCTGRID QUE DABA ERROR
 import { Loading } from '../components/common/Loading';
 import { CATEGORIES } from '../utils/constants';
-import { Filter, SlidersHorizontal, X } from 'lucide-react';
+import { Filter, SlidersHorizontal, X, ShoppingCart, Check } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 // --- MOCK DATA ---
 const MOCK_PRODUCTS: Product[] = [
@@ -95,6 +95,8 @@ export const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [addedToCart, setAddedToCart] = useState<string | null>(null);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     setTimeout(() => {
@@ -102,6 +104,13 @@ export const Products = () => {
       setLoading(false);
     }, 800);
   }, []);
+
+  // Cuando se agrega un producto, mostrar confirmación por 1.5 segundos
+  const handleAddToCart = (product: Product) => {
+    addToCart(product);
+    setAddedToCart(product.id);
+    setTimeout(() => setAddedToCart(null), 1500);
+  };
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
@@ -119,24 +128,18 @@ export const Products = () => {
   const allCategories = ['Todos', ...CATEGORIES.filter(c => c !== 'Todos')];
 
   return (
-    // NOTA: Si ves que el menú de arriba te tapa el contenido, 
-    // cambia 'pt-0' por 'pt-24' o más en la siguiente línea.
     <div className="min-h-screen bg-slate-950 text-slate-200">
       
-      {/* HEADER DE LA SECCIÓN */}
-      {/* top-0 funciona bien si NO tienes un Navbar fijo encima. 
-          Si tienes navbar fijo, cambia 'top-0' por 'top-20' */}
+      {/* HEADER */}
       <div className="bg-slate-900/50 border-b border-slate-800 backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <p className="text-slate-400 text-sm">
-                 {filteredProducts.length}
+                {filteredProducts.length} productos
               </p>
             </div>
-
             <div className="flex items-center gap-3 w-full md:w-auto">
-              {/* Botón Filtros (Móvil) */}
               <button 
                 onClick={() => setShowFilters(!showFilters)}
                 className="md:hidden p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white hover:bg-slate-700"
@@ -151,7 +154,7 @@ export const Products = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           
-          {/* SIDEBAR DE FILTROS */}
+          {/* SIDEBAR */}
           <aside className={`
             fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl transition-transform duration-300 md:translate-x-0 md:static md:bg-transparent md:z-0 md:w-64 md:block
             ${showFilters ? 'translate-x-0' : '-translate-x-full'}
@@ -164,7 +167,6 @@ export const Products = () => {
                 </button>
               </div>
 
-              {/* Ajustar 'top-24' si el header de arriba cambia de altura */}
               <div className="sticky top-24 space-y-8">
                 {/* BÚSQUEDA */}
                 <div>
@@ -191,7 +193,7 @@ export const Products = () => {
                 </div>
 
                 {/* CATEGORÍAS */}
-                <div className="pt-6 border-t border-slate-800">
+                <div>
                   <h3 className="flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
                     <Filter className="h-4 w-4" /> Categorías
                   </h3>
@@ -239,35 +241,54 @@ export const Products = () => {
           <main className="flex-1">
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {filteredProducts.map(product => (
-                    <div key={product.id} className="group bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 flex flex-col">
-                      <div className="relative aspect-square overflow-hidden bg-slate-800">
-                        <img 
-                          src={product.image_url} 
-                          alt={product.name} 
-                          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60" />
-                        <span className="absolute top-4 right-4 bg-slate-950/80 backdrop-blur-sm text-xs font-bold px-2 py-1 rounded text-white border border-slate-700">
-                           {product.category}
-                        </span>
-                      </div>
+                {filteredProducts.map(product => (
+                  <div key={product.id} className="group bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 flex flex-col">
+                    <div className="relative aspect-square overflow-hidden bg-slate-800">
+                      <img 
+                        src={product.image_url} 
+                        alt={product.name} 
+                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60" />
+                      <span className="absolute top-4 right-4 bg-slate-950/80 backdrop-blur-sm text-xs font-bold px-2 py-1 rounded text-white border border-slate-700">
+                        {product.category}
+                      </span>
+                    </div>
+                    
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-1">{product.name}</h3>
+                      <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-1">{product.description}</p>
                       
-                      <div className="p-5 flex-1 flex flex-col">
-                        <h3 className="text-lg font-bold text-white mb-2 line-clamp-1">{product.name}</h3>
-                        <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-1">{product.description}</p>
-                        
-                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
-                          <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                            ${new Intl.NumberFormat('es-CO').format(product.price)}
-                          </span>
-                          <button className="px-4 py-2 rounded-lg bg-white text-slate-950 text-sm font-bold hover:bg-slate-200 transition-colors">
-                            Ver Detalles
-                          </button>
-                        </div>
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
+                        <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                          ${new Intl.NumberFormat('es-CO').format(product.price)}
+                        </span>
+
+                        {/* BOTÓN AGREGAR AL CARRITO */}
+                        <button 
+                          onClick={() => handleAddToCart(product)}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
+                            addedToCart === product.id
+                              ? 'bg-green-600 text-white'
+                              : 'bg-white text-slate-950 hover:bg-slate-200'
+                          }`}
+                        >
+                          {addedToCart === product.id ? (
+                            <>
+                              <Check className="h-4 w-4" />
+                              Agregado
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingCart className="h-4 w-4" />
+                              Al Carrito
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
-                 ))}
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center bg-slate-900/30 rounded-3xl border border-slate-800 border-dashed">

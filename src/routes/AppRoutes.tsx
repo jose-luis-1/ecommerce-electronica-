@@ -7,6 +7,7 @@ import { Login } from '../pages/Login';
 // Importamos iconos para la página 404
 import { FileQuestion, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Admin } from '../pages/Admin';
 
 // --- COMPONENTE AUXILIAR: SCROLL TO TOP ---
 // Este "truco" hace que la página suba al inicio cada vez que cambias de ruta
@@ -54,7 +55,8 @@ export const AppRoutes = () => {
         <Route path="/products" element={<Products />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
-        
+        <Route path="/admin" element={<Admin />} />
+
         {/* Ruta Comodín (*) - Captura cualquier URL desconocida */}
         <Route path="*" element={<NotFound />} />
       </Routes>

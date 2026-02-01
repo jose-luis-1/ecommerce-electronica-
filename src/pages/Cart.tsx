@@ -36,7 +36,7 @@ export const Cart = () => {
           <Link to="/products">
             <Button 
               size="lg"
-              className="bg-white text-slate-950 hover:bg-slate-200 font-bold px-8 rounded-full shadow-lg shadow-white/10"
+              className=" border-slate-700 text-white hover:bg-slate-800  font-bold px-8 rounded-full shadow-lg shadow-white/10"
             >
               Ver Productos
             </Button>

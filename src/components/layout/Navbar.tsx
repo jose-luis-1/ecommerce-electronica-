@@ -4,6 +4,7 @@ import type { LinkProps } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useAdmin } from '../../context/AdminContext';
 // Iconos Premium
 import { 
   ShoppingBag, Menu, X, User, 
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 
 export const Navbar = () => {
+  const { isAdmin } = useAdmin();
   const { cartCount } = useCart();
   const { user, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -25,6 +27,12 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  {isAdmin && (
+  <Link to="/admin" className="text-gray-700 hover:text-primary-600">
+    Admin
+  </Link>
+)}
 
   // Cerrar menú móvil al cambiar de ruta
   useEffect(() => {
