@@ -1,10 +1,10 @@
-import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
-import { AdminProvider } from './context/AdminContext';
-import { Navbar } from './components/layout/Navbar';
-import { Footer } from './components/layout/Footer';
-import { AppRoutes } from './routes/AppRoutes';
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
+import { AdminProvider } from "./context/AdminContext";
+import { Navbar } from "./components/layout/Navbar";
+import { Footer } from "./components/layout/Footer";
+import { AppRoutes } from "./routes/AppRoutes";
 
 function App() {
   return (
@@ -12,15 +12,12 @@ function App() {
       <AuthProvider>
         <AdminProvider>
           <CartProvider>
-            {/* Contenedor principal con el fondo oscuro unificado */}
             <div className="flex flex-col min-h-screen bg-slate-950">
               <Navbar />
-              
-              {/* Este 'padding-top' (pt) es el que evita que el Navbar tape el contenido */}
-              <main className="flex-grow pt-20 md:pt-24">
+              {/* Aumentamos el padding superior para despejar el área del Navbar */}
+              <main className="flex-grow pt-32 md:pt-40">
                 <AppRoutes />
               </main>
-              
               <Footer />
             </div>
           </CartProvider>
