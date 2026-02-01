@@ -125,7 +125,7 @@ export const Admin = () => {
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+    <div className=" border-slate-700 text-white hover:bg-slate-800 ">
       <div className="max-w-7xl mx-auto">
         {/* ENCABEZADO CORREGIDO PARA EVITAR SOBREPOSICIÓN */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-y-6 mb-12 border-b border-slate-800 pb-8">
