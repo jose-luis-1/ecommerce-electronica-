@@ -12,11 +12,15 @@ function App() {
       <AuthProvider>
         <AdminProvider>
           <CartProvider>
-            <div className="flex flex-col min-h-screen bg-gray-50">
+            {/* Contenedor principal con el fondo oscuro unificado */}
+            <div className="flex flex-col min-h-screen bg-slate-950">
               <Navbar />
-              <main className="flex-grow">
+              
+              {/* Este 'padding-top' (pt) es el que evita que el Navbar tape el contenido */}
+              <main className="flex-grow pt-20 md:pt-24">
                 <AppRoutes />
               </main>
+              
               <Footer />
             </div>
           </CartProvider>
@@ -26,4 +30,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
