@@ -67,7 +67,7 @@ export const Login = () => {
             Ingresa tus credenciales para acceder a TechStore
           </p>
         </div>
-        
+
 
         {/* Formulario Glassmorphism */}
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl shadow-black/50">
@@ -80,7 +80,7 @@ export const Login = () => {
                 {error}
               </div>
             )}
-
+            
             <div className="space-y-5">
               {/* Input Email Personalizado */}
               <div className="relative group">

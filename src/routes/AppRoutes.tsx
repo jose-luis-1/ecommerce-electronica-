@@ -44,6 +44,7 @@ const NotFound = () => (
 );
 
 // --- RUTAS PRINCIPALES ---
+// esta linea comentada se debe borrar 
 export const AppRoutes = () => {
   return (
     <>
