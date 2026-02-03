@@ -15,7 +15,7 @@ function App() {
             <div className="flex flex-col min-h-screen bg-slate-950">
               <Navbar />
               {/* Aumentamos el padding superior para despejar el área del Navbar */}
-              <main className="flex-grow pt-32 md:pt-40">
+              <main className="flex-grow pt-32 md:pt-20">
                 <AppRoutes />
               </main>
               <Footer />

@@ -43,7 +43,7 @@ const FEATURES = [
   {
     icon: Truck,
     title: 'Envío Global',
-    desc: 'Gratis en pedidos +$100',
+    desc: 'Gratis en pedidos +$100.000',
     color: 'text-blue-400'
   },
   {

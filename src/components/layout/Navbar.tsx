@@ -55,7 +55,7 @@ export const Navbar = () => {
           </Link>
 
           {/* 2. MENÚ DESKTOP (Centro) */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-10">
             <NavLink to="/" current={location.pathname === '/'}>Inicio</NavLink>
             <NavLink to="/products" current={location.pathname.startsWith('/products')}>Catálogo</NavLink>
             {isAdmin && (

@@ -101,13 +101,7 @@ export const Login = () => {
               </div>
 
               {/* Input Password Personalizado */}
-              <div className="relative group">
-                <div className="flex justify-between items-center mb-1.5 ml-1">
-                  <label className="block text-sm font-medium text-slate-400">Contraseña</label>
-                  <a href="#" className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors">
-                    ¿Olvidaste tu contraseña?
-                  </a>
-                </div>
+              <div className="relative group">              
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
@@ -131,6 +125,13 @@ export const Login = () => {
                 </div>
               </div>
             </div>
+
+            <div className="flex justify-between items-center mb-1.5 ml-1">
+                  <label className="block text-sm font-medium text-slate-400">Contraseña</label>
+                  <a href="#" className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors">
+                    ¿Olvidaste tu contraseña?
+                  </a>
+                </div>
 
             {/* Botón Submit con Estado de Carga */}
             <button
@@ -165,25 +166,6 @@ export const Login = () => {
             </p>
           </div>
           
-          {/* Divisor Social (Opcional) */}
-          <div className="mt-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-800"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-slate-900 px-2 text-slate-500">O continúa con</span>
-            </div>
-          </div>
-          
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <button className="flex items-center justify-center py-2.5 border border-slate-700 rounded-xl hover:bg-slate-800 transition-colors">
-              <span className="text-white font-medium text-sm">Google</span>
-            </button>
-            <button className="flex items-center justify-center py-2.5 border border-slate-700 rounded-xl hover:bg-slate-800 transition-colors">
-              <span className="text-white font-medium text-sm">GitHub</span>
-            </button>
-          </div>
-
         </div>
       </div>
     </div>
