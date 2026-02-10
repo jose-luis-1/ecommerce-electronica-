@@ -1,15 +1,16 @@
-import { useState, useEffect, } from 'react';
+import { useState, useEffect,} from 'react';
 import { supabase, type Product } from '../services/supabase';
 import { Loading } from '../components/common/Loading';
 import { CATEGORIES } from '../utils/constants';
 import { Filter, SlidersHorizontal, X, ShoppingCart, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useSearch } from '../context/SearchContext';
 
 export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [searchTerm,] = useState('');
+  const { searchTerm } = useSearch();
   const [showFilters, setShowFilters] = useState(false);
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
   const { addToCart } = useCart();

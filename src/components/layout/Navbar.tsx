@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useAdmin } from "../../context/AdminContext";
+import { useSearch } from "../../context/SearchContext";
 import { type ChangeEvent } from "react";
 // Iconos Premium
 import {
@@ -19,7 +20,7 @@ import {
 } from "lucide-react";
 
 export const Navbar = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const { searchTerm, setSearchTerm } = useSearch();
   const { isAdmin } = useAdmin();
   const { cartCount } = useCart();
   const { user, signOut } = useAuth();
