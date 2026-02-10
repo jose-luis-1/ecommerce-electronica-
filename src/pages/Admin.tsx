@@ -20,6 +20,7 @@ export const Admin = () => {
     price: "",
     category: "",
     image_url: "",
+    image_file: null as File | null,
     stock: "",
     discount: "",
   });
@@ -57,6 +58,7 @@ export const Admin = () => {
       price: "",
       category: "",
       image_url: "",
+      image_file: null,
       stock: "",
       discount: "",
     });
@@ -72,6 +74,7 @@ export const Admin = () => {
       price: product.price.toString(),
       category: product.category,
       image_url: product.image_url || "",
+      image_file: null,
       stock: product.stock.toString(),
       discount: product.discount?.toString() || "",
     });
@@ -79,36 +82,57 @@ export const Admin = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const productData = {
-        name: formData.name,
-        description: formData.description,
-        price: parseFloat(formData.price),
-        category: formData.category,
-        image_url: formData.image_url,
-        stock: parseInt(formData.stock),
-        discount: formData.discount ? parseFloat(formData.discount) : null,
-      };
+  e.preventDefault();
+  try {
+    let imageUrl = formData.image_url; // ⬅️ DECLARAR AQUÍ AL INICIO
 
-      if (editingProduct) {
-        const { error } = await supabase
-          .from("products")
-          .update(productData)
-          .eq("id", editingProduct.id);
-        if (error) throw error;
-        alert("Producto actualizado");
-      } else {
-        const { error } = await supabase.from("products").insert([productData]);
-        if (error) throw error;
-        alert("Producto agregado");
-      }
-      resetForm();
-      fetchProducts();
-    } catch (error: any) {
-      alert("Error: " + error.message);
+    // Subir imagen si hay un archivo seleccionado
+    if (formData.image_file) {
+      const fileExt = formData.image_file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("products")
+        .upload(filePath, formData.image_file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("products")
+        .getPublicUrl(filePath);
+
+      imageUrl = data.publicUrl;
     }
-  };
+
+    const productData = {
+      name: formData.name,
+      description: formData.description,
+      price: parseFloat(formData.price),
+      category: formData.category,
+      image_url: imageUrl, // ⬅️ Ahora sí está definida
+      stock: parseInt(formData.stock),
+      discount: formData.discount ? parseFloat(formData.discount) : null,
+    };
+
+    if (editingProduct) {
+      const { error } = await supabase
+        .from("products")
+        .update(productData)
+        .eq("id", editingProduct.id);
+      if (error) throw error;
+      alert("Producto actualizado");
+    } else {
+      const { error } = await supabase.from("products").insert([productData]);
+      if (error) throw error;
+      alert("Producto agregado");
+    }
+    resetForm();
+    fetchProducts();
+  } catch (error: any) {
+    alert("Error: " + error.message);
+  }
+};
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Estás seguro?")) return;
@@ -180,14 +204,32 @@ export const Admin = () => {
                   required
                 />
               </div>
-              <Input
-                label="URL de la Imagen"
-                value={formData.image_url}
-                onChange={(e) =>
-                  setFormData({ ...formData, image_url: e.target.value })
-                }
-                required
-              />
+              <div className="space-y-2">
+                <Input
+                  type="file"
+                  label="Imagen del Producto"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const imageUrl = URL.createObjectURL(file);
+                      setFormData({
+                        ...formData,
+                        image_url: imageUrl,
+                        image_file: file,
+                      });
+                    }
+                  }}
+                  required={!editingProduct} // Solo requerido al crear
+                />
+                {formData.image_url && (
+                  <img
+                    src={formData.image_url}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg border border-slate-700"
+                  />
+                )}
+              </div>
               <div className="flex gap-4 pt-4">
                 <Button type="submit" fullWidth>
                   {editingProduct ? "Guardar Cambios" : "Confirmar Registro"}
