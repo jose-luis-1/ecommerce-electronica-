@@ -4,6 +4,7 @@ export const CATEGORIES = [
   'Audífonos',
   'Relojes Inteligentes',
   'Tablets',
+  'Monitores',
   'Accesorios',
 ];
 

@@ -87,9 +87,9 @@ export const Home = () => {
 
           {/* Título Principal */}
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-6">
-            El futuro de la <br />
+            Tecnología confiable<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-              tecnología es hoy.
+              a un clic de distancia.
             </span>
           </h1>
 

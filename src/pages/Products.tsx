@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent } from 'react';
+import { useState, useEffect, } from 'react';
 import { supabase, type Product } from '../services/supabase';
 import { Loading } from '../components/common/Loading';
 import { CATEGORIES } from '../utils/constants';
@@ -9,7 +9,7 @@ export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm,] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
   const { addToCart } = useCart();
@@ -83,7 +83,7 @@ export const Products = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <p className="text-slate-400 text-sm italic">
-                Mostrando {filteredProducts.length} productos reales desde la base de datos
+                Mostrando {filteredProducts.length} 
               </p>
             </div>
             <div className="flex items-center gap-3 w-full md:w-auto">
@@ -116,18 +116,7 @@ export const Products = () => {
 
               <div className="sticky top-24 space-y-8">
                 {/* BUSCADOR */}
-                <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Buscar</h3>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="¿Qué buscas hoy?"
-                      value={searchTerm}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                      className="block w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                    />
-                  </div>
-                </div>
+                
 
                 {/* CATEGORÍAS DINÁMICAS */}
                 <div>
