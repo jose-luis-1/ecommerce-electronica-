@@ -184,6 +184,22 @@ export const Admin = () => {
                 }
                 required
               />
+              <Input
+                label="Categoría"
+                value={formData.category}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
+                required
+              />
+              <Input
+                label="Descripción"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                required
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   label="Precio"
