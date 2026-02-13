@@ -14,9 +14,17 @@ interface CreateOrderResult {
 }
 
 export const createOrder = async (
-  userId: string,
+  userId: string | null,
   cartItems: CartItem[],
-  total: number
+  total: number,
+  customerEmail?: string, 
+  customerInfo?: {       
+    name?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    notes?: string;
+  }
 ): Promise<CreateOrderResult> => {
   try {
     // 1. Crear la orden
@@ -24,9 +32,15 @@ export const createOrder = async (
       .from('orders')
       .insert([
         {
-          user_id: userId,
+          user_id: userId, 
           total: total,
           status: 'pendiente',
+          customer_email: customerEmail, 
+          customer_name: customerInfo?.name, 
+          customer_phone: customerInfo?.phone, 
+          delivery_address: customerInfo?.address, 
+          delivery_city: customerInfo?.city, 
+          notes: customerInfo?.notes, 
         },
       ])
       .select()
@@ -61,7 +75,6 @@ export const createOrder = async (
 
       if (stockError) {
         console.error(`Error actualizando stock de ${item.name}:`, stockError);
-        // No lanzamos error para no bloquear el proceso
       }
     }
 
@@ -89,9 +102,9 @@ export const generateWhatsAppMessage = (
     .join('\n');
 
   const message = `
-🧾 *Nueva Orden - TechStore*
+🛒 *Nueva Orden - TechStore*
 
-📦 *Orden:* ${orderId.substring(0, 8)}
+📋 *Orden:* ${orderId.substring(0, 8)}
 📅 *Fecha:* ${new Date().toLocaleString('es-CO')}
 
 *Productos:*
@@ -99,7 +112,7 @@ ${productsText}
 
 💰 *Subtotal:* $${new Intl.NumberFormat('es-CO').format(total)}
 🚚 *Envío:* $${new Intl.NumberFormat('es-CO').format(shipping)}
-✨ *Total:* $${new Intl.NumberFormat('es-CO').format(total + shipping)}
+💳 *Total:* $${new Intl.NumberFormat('es-CO').format(total + shipping)}
 
 _Por favor, confirma tu pedido para proceder con el envío._
 `.trim();

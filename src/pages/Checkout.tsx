@@ -8,7 +8,7 @@ import { Button } from '../components/common/Button';
 import { ArrowLeft, CheckCircle, Loader } from 'lucide-react';
 
 const SHIPPING_COST = 15000;
-const WHATSAPP_PHONE = '573014610269'; // Reemplaza con tu número de WhatsApp
+const WHATSAPP_PHONE = '573014610269';
 
 export const Checkout = () => {
   const { cartItems, cartTotal, clearCart } = useCart();
@@ -20,6 +20,7 @@ export const Checkout = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    email: '', // ✅ Agregado
     phone: '',
     address: '',
     city: '',
@@ -28,6 +29,7 @@ export const Checkout = () => {
 
   const [errors, setErrors] = useState({
     name: '',
+    email: '', // ✅ Agregado
     phone: '',
     address: '',
     city: '',
@@ -35,12 +37,6 @@ export const Checkout = () => {
 
   const shipping = cartTotal > 100000 ? 0 : SHIPPING_COST;
   const total = cartTotal + shipping;
-
-  // Redirigir si no está logueado
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
 
   // Redirigir si el carrito está vacío
   if (cartItems.length === 0 && !orderSuccess) {
@@ -51,6 +47,7 @@ export const Checkout = () => {
   const validateForm = (): boolean => {
     const newErrors = {
       name: '',
+      email: '', 
       phone: '',
       address: '',
       city: '',
@@ -58,6 +55,13 @@ export const Checkout = () => {
 
     if (!formData.name.trim()) {
       newErrors.name = 'El nombre es requerido';
+    }
+
+    // ✅ NUEVO: Validar email
+    if (!formData.email.trim()) {
+      newErrors.email = 'El email es requerido';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Ingresa un email válido';
     }
 
     if (!formData.phone.trim()) {
@@ -88,16 +92,25 @@ export const Checkout = () => {
     setLoading(true);
 
     try {
-      // Crear la orden en Supabase
+      // ✅ MODIFICADO: Pasar userId como opcional y agregar email + customerInfo
       const result = await createOrder(
-        user.id,
+        user?.id || null, // null si no está logueado
         cartItems.map((item) => ({
           id: item.id,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
         })),
-        total
+        total,
+        formData.email, // ✅ NUEVO: email
+        {
+          // ✅ NUEVO: información del cliente
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          notes: formData.notes,
+        }
       );
 
       if (!result.success || !result.orderId) {
@@ -190,6 +203,16 @@ export const Checkout = () => {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Juan Pérez"
                     error={errors.name}
+                  />
+
+                  {/* ✅ NUEVO: Campo de email */}
+                  <Input
+                    label="Email *"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="tu@email.com"
+                    error={errors.email}
                   />
 
                   <Input
