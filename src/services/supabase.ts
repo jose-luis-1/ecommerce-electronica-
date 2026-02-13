@@ -27,7 +27,23 @@ export interface Order {
   id: string;
   user_id: string;
   total: number;
-  status: 'pending' | 'completed' | 'cancelled';
+  status: 'pendiente' | 'confirmado' | 'cancelado';
+  created_at: string;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  user_id: string;
+  total: number;
+  status: 'pendiente' | 'confirmado' | 'cancelado';
   created_at: string;
 }
 

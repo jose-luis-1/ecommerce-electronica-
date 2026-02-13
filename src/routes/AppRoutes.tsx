@@ -4,6 +4,7 @@ import { Home } from '../pages/Home';
 import { Products } from '../pages/Products';
 import { Cart } from '../pages/Cart';
 import { Login } from '../pages/Login';
+import { Checkout } from '../pages/Checkout';
 // Importamos iconos para la página 404
 import { FileQuestion, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -52,6 +53,7 @@ export const AppRoutes = () => {
       <ScrollToTop />
       
       <Routes>
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/cart" element={<Cart />} />
