@@ -166,6 +166,11 @@ export const Products = () => {
                       <span className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded text-white border border-white/10">
                         {product.category}
                       </span>
+                      {product.discount && product.discount > 0 && (
+                        <div className="absolute top-4 left-4 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                          -{product.discount}%
+                        </div>
+                      )}
                     </div>
  
                     <div className="p-5 flex-1 flex flex-col">
@@ -173,11 +178,25 @@ export const Products = () => {
                       <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-1">{product.description}</p>
  
                       <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-1">
                            <span className="text-xs text-slate-500 uppercase font-bold">Precio</span>
-                           <span className="text-xl font-bold text-blue-400">
-                            ${Number(product.price).toLocaleString('es-CO')}
-                          </span>
+                           {product.discount && product.discount > 0 ? (
+                             <div className="flex flex-col gap-1">
+                               <span className="text-sm text-slate-400 line-through">
+                                 ${Number(product.price).toLocaleString('es-CO')}
+                               </span>
+                               <span className="text-xl font-bold text-green-400">
+                                 ${Number(product.price * (1 - product.discount / 100)).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                               </span>
+                               <span className="text-xs text-orange-400 font-semibold">
+                                 Ahorras: ${Number(product.price - (product.price * (1 - product.discount / 100))).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                               </span>
+                             </div>
+                           ) : (
+                             <span className="text-xl font-bold text-blue-400">
+                              ${Number(product.price).toLocaleString('es-CO')}
+                            </span>
+                           )}
                         </div>
 
                         <button
