@@ -184,10 +184,10 @@ export const Admin = () => {
                 }
                 required
               />
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Categoría</label>
+              <div className="w-full">
+                <label className="block text-sm font-medium text-slate-300 mb-1 italic">Categoría</label>
                 <select
-                  className="border rounded-lg p-2 bg-white" // Añade aquí tus clases de estilo
+                  className="w-full px-4 py-2 bg-white text-slate-900 border border-slate-700 rounded-lg outline-none transition-all focus:ring-2 focus:ring-blue-500"
                   value={formData.category}
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value })
