@@ -235,6 +235,19 @@ export const Admin = () => {
                   required
                 />
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Descuento (%)"
+                  type="number"
+                  value={formData.discount}
+                  onChange={(e) =>
+                    setFormData({ ...formData, discount: e.target.value })
+                  }
+                  step="0.01"
+                  min="0"
+                  max="100"
+                />
+              </div>
               <div className="space-y-2">
                 <Input
                   type="file"
