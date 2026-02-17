@@ -82,57 +82,57 @@ export const Admin = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    let imageUrl = formData.image_url; // ⬅️ DECLARAR AQUÍ AL INICIO
+    e.preventDefault();
+    try {
+      let imageUrl = formData.image_url; // ⬅️ DECLARAR AQUÍ AL INICIO
 
-    // Subir imagen si hay un archivo seleccionado
-    if (formData.image_file) {
-      const fileExt = formData.image_file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      // Subir imagen si hay un archivo seleccionado
+      if (formData.image_file) {
+        const fileExt = formData.image_file.name.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("products")
-        .upload(filePath, formData.image_file);
+        const { error: uploadError } = await supabase.storage
+          .from("products")
+          .upload(filePath, formData.image_file);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
-        .from("products")
-        .getPublicUrl(filePath);
+        const { data } = supabase.storage
+          .from("products")
+          .getPublicUrl(filePath);
 
-      imageUrl = data.publicUrl;
+        imageUrl = data.publicUrl;
+      }
+
+      const productData = {
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        image_url: imageUrl, // ⬅️ Ahora sí está definida
+        stock: parseInt(formData.stock),
+        discount: formData.discount ? parseFloat(formData.discount) : null,
+      };
+
+      if (editingProduct) {
+        const { error } = await supabase
+          .from("products")
+          .update(productData)
+          .eq("id", editingProduct.id);
+        if (error) throw error;
+        alert("Producto actualizado");
+      } else {
+        const { error } = await supabase.from("products").insert([productData]);
+        if (error) throw error;
+        alert("Producto agregado");
+      }
+      resetForm();
+      fetchProducts();
+    } catch (error: any) {
+      alert("Error: " + error.message);
     }
-
-    const productData = {
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      category: formData.category,
-      image_url: imageUrl, // ⬅️ Ahora sí está definida
-      stock: parseInt(formData.stock),
-      discount: formData.discount ? parseFloat(formData.discount) : null,
-    };
-
-    if (editingProduct) {
-      const { error } = await supabase
-        .from("products")
-        .update(productData)
-        .eq("id", editingProduct.id);
-      if (error) throw error;
-      alert("Producto actualizado");
-    } else {
-      const { error } = await supabase.from("products").insert([productData]);
-      if (error) throw error;
-      alert("Producto agregado");
-    }
-    resetForm();
-    fetchProducts();
-  } catch (error: any) {
-    alert("Error: " + error.message);
-  }
-};
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Estás seguro?")) return;
@@ -184,14 +184,29 @@ export const Admin = () => {
                 }
                 required
               />
-              <Input
-                label="Categoría"
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                required
-              />
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Categoría</label>
+                <select
+                  className="border rounded-lg p-2 bg-white" // Añade aquí tus clases de estilo
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Selecciona una categoría</option>
+                  <option value="Todos">Todos</option>
+                  <option value="Teléfonos">Teléfonos</option>
+                  <option value="Audífonos">Audífonos</option>
+                  <option value="Relojes Inteligentes">
+                    Relojes Inteligentes
+                  </option>
+                  <option value="Tablets">Tablets</option>
+                  <option value="Monitores">Monitores</option>
+                  <option value="Accesorios">Accesorios</option>
+                  <option value="Portátiles">Portátiles</option>
+                </select>
+              </div>
               <Input
                 label="Descripción"
                 value={formData.description}
