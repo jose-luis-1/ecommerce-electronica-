@@ -78,17 +78,17 @@ export const HeroCarousel = () => {
         </div>
 
         {/* Carrusel Principal */}
-        <div className="relative bg-gradient-to-br from-slate-900 via-slate-900 to-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="relative bg-gradient-to-br from-slate-900 via-slate-900 to-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl h-80 sm:h-96">
           
           {/* Fondo decorativo */}
           <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(99,102,241,0.1),rgba(168,85,247,0.1))] pointer-events-none" />
 
           {/* Contenido del slide */}
-          <div className="relative flex flex-col sm:flex-row gap-6 p-4 sm:p-6">
+          <div className="relative flex flex-col sm:flex-row gap-6 p-4 sm:p-6 h-full">
             
             {/* Imagen del producto */}
             <div className="flex items-center justify-center w-full sm:w-1/2">
-              <div className="relative w-full h-56 sm:h-auto rounded-xl overflow-hidden bg-slate-800 group object-cover">
+              <Link to={`/product/${currentProduct.id}`} className="relative w-full h-full rounded-xl overflow-hidden bg-slate-800 group object-cover cursor-pointer">
                 <img
                   src={currentProduct.image_url || 'https://via.placeholder.com/400x400?text=Sin+Imagen'}
                   alt={currentProduct.name}
@@ -102,11 +102,11 @@ export const HeroCarousel = () => {
 
                 {/* Efecto de brillo */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              </div>
+              </Link>
             </div>
 
             {/* Información del producto */}
-            <div className="flex flex-col justify-center w-full sm:w-1/2 p-4 sm:p-6">
+            <div className="flex flex-col justify-center w-full sm:w-1/2 p-4 sm:p-6 overflow-y-auto">
               {/* Categoría */}
               <span className="inline-block bg-slate-800/50 text-slate-300 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full w-fit mb-3">
                 {currentProduct.category}
