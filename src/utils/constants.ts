@@ -7,8 +7,6 @@ export const CATEGORIES = [
   'Monitores',
   'Accesorios',
   'Portátiles',
-  'Ofertas',
-  
 ];
 
 export const PRICE_RANGES = [

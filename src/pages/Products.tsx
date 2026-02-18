@@ -49,8 +49,18 @@ export const Products = () => {
   };
 
   const filteredProducts = products.filter((product) => {
-    const matchesCategory =
-      selectedCategory === 'Todos' || product.category === selectedCategory;
+    let matchesCategory = true;
+    
+    if (selectedCategory === 'Todos') {
+      matchesCategory = true;
+    } else if (selectedCategory === 'Ofertas') {
+      // Filtrar solo productos con descuento
+      matchesCategory = (product.discount ?? 0) > 0;
+    } else {
+      // Filtrar por categoría exacta
+      matchesCategory = product.category === selectedCategory;
+    }
+    
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -60,7 +70,7 @@ export const Products = () => {
 
   if (loading) return <Loading fullScreen />;
 
-  const allCategories = ['Todos', ...CATEGORIES.filter(c => c !== 'Todos')];
+  const allCategories = ['Todos', 'Ofertas', ...CATEGORIES.filter(c => c !== 'Todos')];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
@@ -138,13 +148,15 @@ export const Products = () => {
                           setSelectedCategory(category);
                           setShowFilters(false);
                         }}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl transition-all duration-200 text-sm ${
+                        className={`w-full text-left px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${
                           selectedCategory === category
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
-                            : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                            : category === 'Ofertas'
+                              ? 'text-orange-400 hover:bg-orange-500/20 hover:text-orange-300 border border-orange-500/30'
+                              : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
                         }`}
                       >
-                        {category}
+                        {category === 'Ofertas' ? '🔥 ' : ''}{category}
                       </button>
                     ))}
                   </div>
