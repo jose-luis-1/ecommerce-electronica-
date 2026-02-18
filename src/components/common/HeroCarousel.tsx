@@ -106,44 +106,44 @@ export const HeroCarousel = () => {
             </div>
 
             {/* Información del producto */}
-            <div className="flex flex-col justify-center w-full sm:w-1/2 p-4 sm:p-6 overflow-y-auto">
+            <div className="flex flex-col justify-center w-full sm:w-1/2 p-3 sm:p-6 overflow-y-auto">
               {/* Categoría */}
               <span className="inline-block bg-slate-800/50 text-slate-300 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full w-fit mb-3">
                 {currentProduct.category}
               </span>
 
               {/* Nombre */}
-              <h3 className="text-2xl sm:text-4xl font-bold text-white mb-3 leading-tight">
+              <h3 className="text-xl sm:text-4xl font-bold text-white mb-2 sm:mb-3 leading-tight">
                 {currentProduct.name}
               </h3>
 
               {/* Descripción */}
-              <p className="text-slate-300 text-base mb-4 line-clamp-2">
+              <p className="text-slate-300 text-xs sm:text-base mb-3 sm:mb-4 line-clamp-2">
                 {currentProduct.description}
               </p>
 
               {/* Precios */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-end gap-3">
-                  <span className="text-slate-400 line-through text-base">
+              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                <div className="flex items-end gap-2 sm:gap-3">
+                  <span className="text-slate-400 line-through text-xs sm:text-base">
                     ${Number(currentProduct.price).toLocaleString('es-CO')}
                   </span>
-                  <span className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
+                  <span className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                     ${Number(discountedPrice).toLocaleString('es-CO', { maximumFractionDigits: 0 })}
                   </span>
                 </div>
 
                 {/* Ahorro */}
-                <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-1 inline-block">
-                  <p className="text-xs text-green-400 font-semibold">
+                <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-2 sm:px-3 py-1 inline-block">
+                  <p className="text-[10px] sm:text-xs text-green-400 font-semibold">
                     💚 Ahorras: ${Number(savings).toLocaleString('es-CO', { maximumFractionDigits: 0 })}
                   </p>
                 </div>
               </div>
 
               {/* Stock */}
-              <div className="mb-6">
-                <p className="text-xs text-slate-400 mb-1">
+              <div className="mb-3 sm:mb-6">
+                <p className="text-[10px] sm:text-xs text-slate-400 mb-1">
                   Stock: <span className={`font-bold ${currentProduct.stock > 10 ? 'text-green-400' : currentProduct.stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>
                     {currentProduct.stock} unidades
                   </span>
