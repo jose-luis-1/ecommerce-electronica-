@@ -64,15 +64,15 @@ export const Products = () => {
       // Filtrar solo productos con descuento
       matchesCategory = (product.discount ?? 0) > 0;
     } else {
-      // Filtrar por categoría exacta
+      // Filtrar por categoría exacta (sin filtro de descuento)
       matchesCategory = product.category === selectedCategory;
     }
     
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesDiscount = !showOnlyDiscounts || (product.discount && product.discount > 0);
-    return matchesCategory && matchesSearch && matchesDiscount;
+    
+    return matchesCategory && matchesSearch;
   });
 
   // --- ORDENAR PRODUCTOS: DESTACADO PRIMERO (solo si está en ofertas) ---
