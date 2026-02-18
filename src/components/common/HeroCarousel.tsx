@@ -158,7 +158,7 @@ export const HeroCarousel = () => {
 
               {/* Botón de acción */}
               <Link 
-                to="/products?discount=true"
+                to={`/products?discount=true&featured=${currentProduct.id}`}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 text-center text-base shadow-lg shadow-purple-900/50 hover:shadow-purple-900/70 hover:scale-105"
               >
                 Ver Oferta Completa
