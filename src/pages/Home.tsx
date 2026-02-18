@@ -1,6 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from '../components/common/Button';
+import { HeroCarousel } from '../components/common/HeroCarousel';
 // Importamos iconos profesionales de Lucide React
 import { 
   Smartphone, Headphones, Watch, 
@@ -145,7 +146,10 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 2. CATEGORÍAS (Estilo Bento Grid) */}
+      {/* 2. CARRUSEL DE OFERTAS DESTACADAS */}
+      <HeroCarousel />
+
+      {/* 3. CATEGORÍAS (Estilo Bento Grid) */}
       <section className="py-24 bg-slate-950 relative z-10">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
@@ -179,7 +183,7 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 3. CARACTERÍSTICAS (Trust Signals) */}
+      {/* 4. CARACTERÍSTICAS (Trust Signals) */}
       <section className="py-16 border-y border-slate-800/50 bg-slate-900/20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-slate-800">
