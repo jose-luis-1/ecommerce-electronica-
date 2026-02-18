@@ -78,7 +78,7 @@ export const HeroCarousel = () => {
         </div>
 
         {/* Carrusel Principal */}
-        <div className="relative bg-gradient-to-br from-slate-900 via-slate-900 to-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl h-80 sm:h-96">
+        <div className="relative bg-gradient-to-br from-slate-900 via-slate-900 to-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl h-auto sm:h-96">
           
           {/* Fondo decorativo */}
           <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(99,102,241,0.1),rgba(168,85,247,0.1))] pointer-events-none" />
