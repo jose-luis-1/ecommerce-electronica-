@@ -20,7 +20,7 @@ export const Checkout = () => {
 
   const [formData, setFormData] = useState({
     name: '',
-    email: '', // ✅ Agregado
+    email: '', 
     phone: '',
     address: '',
     city: '',
@@ -29,7 +29,7 @@ export const Checkout = () => {
 
   const [errors, setErrors] = useState({
     name: '',
-    email: '', // ✅ Agregado
+    email: '', 
     phone: '',
     address: '',
     city: '',
@@ -241,7 +241,7 @@ export const Checkout = () => {
                   />
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-400 mb-1">
+                    <label className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
                       Notas Adicionales (Opcional)
                     </label>
                     <textarea

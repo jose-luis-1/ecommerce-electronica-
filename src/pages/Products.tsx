@@ -37,24 +37,7 @@ export const Products = () => {
     fetchProducts();
   }, []);
 
-  // --- FUNCIÓN PARA OBTENER URL PÚBLICA DE LA IMAGEN ---
-  const getImageUrl = (imagePath: string | null) => {
-    if (!imagePath) {
-      return 'https://via.placeholder.com/400x400?text=Sin+Imagen';
-    }
 
-    // Si ya es una URL completa, retornarla directamente
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-
-    // Si es una ruta de Supabase Storage, obtener la URL pública
-    const { data } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(imagePath);
-
-    return data.publicUrl;
-  };
 
   const handleAddToCart = (product: Product) => {
     addToCart(product);
@@ -155,13 +138,9 @@ export const Products = () => {
                   <div key={product.id} className="group bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 flex flex-col shadow-xl">
                     <div className="relative aspect-square overflow-hidden bg-slate-800">
                       <img
-                        src={getImageUrl(product.image_url)}
+                        src={product.image_url || 'https://via.placeholder.com/400x400?text=Sin+Imagen'}
                         alt={product.name}
                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          // Fallback si la imagen no carga
-                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=Sin+Imagen';
-                        }}
                       />
                       <span className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded text-white border border-white/10">
                         {product.category}
@@ -185,7 +164,7 @@ export const Products = () => {
                                <span className="text-sm text-slate-400 line-through">
                                  ${Number(product.price).toLocaleString('es-CO')}
                                </span>
-                               <span className="text-xl font-bold text-green-400">
+                               <span className="text-xl font-bold text-blue-400">
                                  ${Number(product.price * (1 - product.discount / 100)).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                </span>
                                <span className="text-xs text-orange-400 font-semibold">
@@ -204,7 +183,7 @@ export const Products = () => {
                           disabled={product.stock <= 0}
                           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                             addedToCart === product.id
-                              ? 'bg-green-600 text-white'
+                              ? 'bg-blue-600 text-white'
                               : product.stock <= 0
                                 ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                                 : 'bg-white text-slate-950 hover:bg-blue-500 hover:text-white'
