@@ -87,7 +87,7 @@ export const Products = () => {
  
           {/* SIDEBAR DE FILTROS */}
           <aside className={`
-            fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl transition-transform duration-300 md:translate-x-0 md:static md:bg-transparent md:z-0 md:w-64 md:block
+            fixed top-16 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl transition-transform duration-300 h-[calc(100vh-64px)] overflow-y-auto md:translate-x-0 md:static md:bg-transparent md:z-0 md:w-64 md:block md:top-0 md:h-auto
             ${showFilters ? 'translate-x-0' : '-translate-x-full'}
           `}>
             <div className="p-6 md:p-0 h-full overflow-y-auto">
@@ -133,14 +133,14 @@ export const Products = () => {
           {/* GRID DE PRODUCTOS REALES */}
           <main className="flex-1">
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {filteredProducts.map(product => (
                   <div key={product.id} className="group bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 flex flex-col shadow-xl">
-                    <div className="relative aspect-square overflow-hidden bg-slate-800">
+                    <div className="relative overflow-hidden bg-slate-800">
                       <img
                         src={product.image_url || 'https://via.placeholder.com/400x400?text=Sin+Imagen'}
                         alt={product.name}
-                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                        className="h-36 sm:h-48 w-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <span className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded text-white border border-white/10">
                         {product.category}
@@ -153,18 +153,18 @@ export const Products = () => {
                     </div>
  
                     <div className="p-5 flex-1 flex flex-col">
-                      <h3 className="text-lg font-bold text-white mb-2">{product.name}</h3>
-                      <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-1">{product.description}</p>
+                      <h3 className="text-sm sm:text-base font-bold text-white mb-2 line-clamp-2">{product.name}</h3>
+                      <p className="text-xs sm:text-sm text-slate-400 mb-4 line-clamp-2 flex-1">{product.description}</p>
  
                       <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
                         <div className="flex flex-col gap-1">
                            <span className="text-xs text-slate-500 uppercase font-bold">Precio</span>
                            {product.discount && product.discount > 0 ? (
                              <div className="flex flex-col gap-1">
-                               <span className="text-sm text-slate-400 line-through">
+                               <span className="text-xs sm:text-sm text-slate-400 line-through">
                                  ${Number(product.price).toLocaleString('es-CO')}
                                </span>
-                               <span className="text-xl font-bold text-blue-400">
+                               <span className="text-base sm:text-lg font-bold text-blue-400">
                                  ${Number(product.price * (1 - product.discount / 100)).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                </span>
                                <span className="text-xs text-orange-400 font-semibold">
@@ -172,7 +172,7 @@ export const Products = () => {
                                </span>
                              </div>
                            ) : (
-                             <span className="text-xl font-bold text-blue-400">
+                             <span className="text-base sm:text-lg font-bold text-blue-400">
                               ${Number(product.price).toLocaleString('es-CO')}
                             </span>
                            )}
@@ -181,7 +181,7 @@ export const Products = () => {
                         <button
                           onClick={() => handleAddToCart(product)}
                           disabled={product.stock <= 0}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                          className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
                             addedToCart === product.id
                               ? 'bg-blue-600 text-white'
                               : product.stock <= 0

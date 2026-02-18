@@ -84,11 +84,11 @@ export const HeroCarousel = () => {
           <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(99,102,241,0.1),rgba(168,85,247,0.1))] pointer-events-none" />
 
           {/* Contenido del slide */}
-          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 p-6 md:p-8">
+          <div className="relative flex flex-col sm:flex-row gap-6 p-4 sm:p-6">
             
             {/* Imagen del producto */}
-            <div className="flex items-center justify-center order-2 md:order-1">
-              <div className="relative w-full h-72 md:h-80 rounded-xl overflow-hidden bg-slate-800 group">
+            <div className="flex items-center justify-center w-full sm:w-1/2">
+              <div className="relative w-full h-56 sm:h-auto rounded-xl overflow-hidden bg-slate-800 group object-cover">
                 <img
                   src={currentProduct.image_url || 'https://via.placeholder.com/400x400?text=Sin+Imagen'}
                   alt={currentProduct.name}
@@ -106,14 +106,14 @@ export const HeroCarousel = () => {
             </div>
 
             {/* Información del producto */}
-            <div className="flex flex-col justify-center order-1 md:order-2">
+            <div className="flex flex-col justify-center w-full sm:w-1/2 p-4 sm:p-6">
               {/* Categoría */}
               <span className="inline-block bg-slate-800/50 text-slate-300 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full w-fit mb-3">
                 {currentProduct.category}
               </span>
 
               {/* Nombre */}
-              <h3 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+              <h3 className="text-2xl sm:text-4xl font-bold text-white mb-3 leading-tight">
                 {currentProduct.name}
               </h3>
 
