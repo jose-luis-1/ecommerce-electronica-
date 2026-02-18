@@ -131,7 +131,15 @@ export const Checkout = () => {
           quantity: item.quantity,
         })),
         cartTotal,
-        shipping
+        shipping,
+        {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          notes: formData.notes,
+        }
       );
 
       // Limpiar carrito

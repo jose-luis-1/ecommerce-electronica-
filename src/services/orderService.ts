@@ -95,26 +95,44 @@ export const generateWhatsAppMessage = (
   orderId: string,
   cartItems: CartItem[],
   total: number,
-  shipping: number
+  shipping: number,
+  customerInfo?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    notes?: string;
+  }
 ): string => {
   const productsText = cartItems
     .map((item) => `• ${item.name} x${item.quantity} - $${new Intl.NumberFormat('es-CO').format(item.price * item.quantity)}`)
     .join('\n');
 
+  const customerSection = customerInfo ? `
+👤 DATOS DEL CLIENTE:
+- Nombre: ${customerInfo.name || 'N/A'}
+- Email: ${customerInfo.email || 'N/A'}
+- Telefono: ${customerInfo.phone || 'N/A'}
+- Direccion: ${customerInfo.address || 'N/A'}
+- Ciudad: ${customerInfo.city || 'N/A'}
+- Notas: ${customerInfo.notes || 'Ninguna'}
+` : '';
+
   const message = `
-🛒 *Nueva Orden - TechStore*
+🛒 *NUEVA ORDEN - TECHSTORE*
 
-📋 *Orden:* ${orderId.substring(0, 8)}
-📅 *Fecha:* ${new Date().toLocaleString('es-CO')}
+📋 Orden: ${orderId.substring(0, 8)}
+📅 Fecha: ${new Date().toLocaleString('es-CO')}
 
-*Productos:*
+*PRODUCTOS:*
 ${productsText}
 
-💰 *Subtotal:* $${new Intl.NumberFormat('es-CO').format(total)}
-🚚 *Envío:* $${new Intl.NumberFormat('es-CO').format(shipping)}
-💳 *Total:* $${new Intl.NumberFormat('es-CO').format(total + shipping)}
-
-_Por favor, confirma tu pedido para proceder con el envío._
+💰 Subtotal: $${new Intl.NumberFormat('es-CO').format(total)}
+🚚 Envio: $${new Intl.NumberFormat('es-CO').format(shipping)}
+💳 Total: $${new Intl.NumberFormat('es-CO').format(total + shipping)}
+${customerSection}
+_Por favor, confirma tu pedido para proceder con el envio._
 `.trim();
 
   return message;
@@ -125,9 +143,17 @@ export const sendWhatsAppOrder = (
   orderId: string,
   cartItems: CartItem[],
   total: number,
-  shipping: number
+  shipping: number,
+  customerInfo?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    notes?: string;
+  }
 ) => {
-  const message = generateWhatsAppMessage(orderId, cartItems, total, shipping);
+  const message = generateWhatsAppMessage(orderId, cartItems, total, shipping, customerInfo);
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 };
