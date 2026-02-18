@@ -32,7 +32,7 @@ export const Home = () => {
     <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-purple-500/30">
       
       {/* 1. HERO SECTION CON CARRUSEL */}
-      <section className="relative pt-16 pb-8 overflow-hidden">
+      <section className="relative pt-0 pb-8 overflow-hidden">
         
         {/* Fondo Tecnológico Sutil (Grid Pattern) */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
@@ -45,7 +45,7 @@ export const Home = () => {
         <HeroCarousel />
 
         {/* Sección de Descripción y CTA */}
-        <div className="relative mt-12 max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="relative mt-4 max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
               Tecnología premium al alcance

@@ -66,11 +66,11 @@ export const HeroCarousel = () => {
   const savings = currentProduct.price - discountedPrice;
 
   return (
-    <section className="py-8 relative z-10">
+    <section className="py-0 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Encabezado compacto */}
-        <div className="mb-6">
+        <div className="mb-2">
           <h2 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
             <Zap className="w-7 h-7 text-yellow-400" />
             Ofertas Relámpago
