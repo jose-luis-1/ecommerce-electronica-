@@ -42,6 +42,13 @@ export const Products = () => {
     fetchProducts();
   }, []);
 
+  // --- AUTO-SELECCIONAR "OFERTAS" CUANDO HAY PRODUCTO DESTACADO ---
+  useEffect(() => {
+    if (featuredProductId) {
+      setSelectedCategory('Ofertas');
+    }
+  }, [featuredProductId]);
+
   const handleAddToCart = (product: Product) => {
     addToCart(product);
     setAddedToCart(product.id);
