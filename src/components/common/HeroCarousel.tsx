@@ -73,7 +73,7 @@ export const HeroCarousel = () => {
         <div className="mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
             <Zap className="w-7 h-7 text-yellow-400" />
-            Ofertas en Destaque
+            Ofertas Relámpago
           </h2>
         </div>
 
