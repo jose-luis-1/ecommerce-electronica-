@@ -29,7 +29,7 @@ export const Checkout = () => {
 
   const [errors, setErrors] = useState({
     name: '',
-    email: '', 
+    email: '', // ✅ Agregado
     phone: '',
     address: '',
     city: '',
@@ -241,14 +241,14 @@ export const Checkout = () => {
                   />
 
                   <div>
-                    <label className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                    <label className="block text-sm font-medium text-slate-300 mb-1 italic">
                       Notas Adicionales (Opcional)
                     </label>
                     <textarea
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       placeholder="Ej: Entregar en la portería, etc."
-                      className="input-field resize-none"
+                      className="w-full px-4 py-2 bg-white text-slate-900 border border-slate-700 rounded-lg outline-none transition-all focus:ring-2 focus:ring-blue-500 resize-none placeholder-slate-500"
                       rows={3}
                     />
                   </div>
