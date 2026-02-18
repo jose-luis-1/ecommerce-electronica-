@@ -68,6 +68,14 @@ export const Products = () => {
     return matchesCategory && matchesSearch && matchesDiscount;
   });
 
+  // --- ORDENAR PRODUCTOS: DESTACADO PRIMERO ---
+  const orderedProducts = featuredProductId
+    ? [
+        ...filteredProducts.filter(p => p.id === featuredProductId),
+        ...filteredProducts.filter(p => p.id !== featuredProductId)
+      ]
+    : filteredProducts;
+
   // --- SCROLL AUTOMÁTICO AL PRODUCTO DESTACADO ---
   useEffect(() => {
     if (featuredProductId && productRefs.current[featuredProductId]) {
@@ -98,12 +106,12 @@ export const Products = () => {
                     Ofertas
                   </span>
                   <p className="text-slate-400 text-sm italic">
-                    Mostrando {filteredProducts.length} artículos en descuento
+                    Mostrando {orderedProducts.length} artículos en descuento
                   </p>
                 </div>
               ) : (
                 <p className="text-slate-400 text-sm italic">
-                  Mostrando {filteredProducts.length}
+                  Mostrando {orderedProducts.length}
                 </p>
               )}
             </div>
@@ -179,9 +187,9 @@ export const Products = () => {
 
           {/* GRID DE PRODUCTOS REALES */}
           <main className="flex-1">
-            {filteredProducts.length > 0 ? (
+            {orderedProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                {filteredProducts.map(product => (
+                {orderedProducts.map(product => (
                   <div 
                     key={product.id} 
                     ref={(el) => {
