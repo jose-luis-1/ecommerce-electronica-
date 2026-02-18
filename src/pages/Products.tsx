@@ -68,8 +68,8 @@ export const Products = () => {
     return matchesCategory && matchesSearch && matchesDiscount;
   });
 
-  // --- ORDENAR PRODUCTOS: DESTACADO PRIMERO ---
-  const orderedProducts = featuredProductId
+  // --- ORDENAR PRODUCTOS: DESTACADO PRIMERO (solo si está en ofertas) ---
+  const orderedProducts = (featuredProductId && selectedCategory === 'Ofertas')
     ? [
         ...filteredProducts.filter(p => p.id === featuredProductId),
         ...filteredProducts.filter(p => p.id !== featuredProductId)
