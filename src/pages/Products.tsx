@@ -1,4 +1,5 @@
 import { useState, useEffect,} from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase, type Product } from '../services/supabase';
 import { Loading } from '../components/common/Loading';
 import { CATEGORIES } from '../utils/constants';
@@ -7,6 +8,7 @@ import { useCart } from '../context/CartContext';
 import { useSearch } from '../context/SearchContext';
 
 export const Products = () => {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -14,6 +16,7 @@ export const Products = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
   const { addToCart } = useCart();
+  const showOnlyDiscounts = searchParams.get('discount') === 'true';
 
   // --- CARGA DE DATOS DESDE SUPABASE ---
   useEffect(() => {
@@ -51,7 +54,8 @@ export const Products = () => {
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesDiscount = !showOnlyDiscounts || (product.discount && product.discount > 0);
+    return matchesCategory && matchesSearch && matchesDiscount;
   });
 
   if (loading) return <Loading fullScreen />;
@@ -66,11 +70,30 @@ export const Products = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <p className="text-slate-400 text-sm italic">
-                Mostrando {filteredProducts.length} 
-              </p>
+              {showOnlyDiscounts ? (
+                <div className="flex items-center gap-2">
+                  <span className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    Ofertas
+                  </span>
+                  <p className="text-slate-400 text-sm italic">
+                    Mostrando {filteredProducts.length} artículos en descuento
+                  </p>
+                </div>
+              ) : (
+                <p className="text-slate-400 text-sm italic">
+                  Mostrando {filteredProducts.length}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-3 w-full md:w-auto">
+              {showOnlyDiscounts && (
+                <button
+                  onClick={() => window.history.back()}
+                  className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white hover:bg-slate-700 text-sm font-medium transition-all"
+                >
+                  ← Atrás
+                </button>
+              )}
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="md:hidden p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white hover:bg-slate-700"

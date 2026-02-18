@@ -7,6 +7,7 @@ export const CATEGORIES = [
   'Monitores',
   'Accesorios',
   'Portátiles',
+  'Ofertas',
   
 ];
 
