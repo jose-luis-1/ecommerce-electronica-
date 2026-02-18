@@ -88,7 +88,7 @@ export const HeroCarousel = () => {
             
             {/* Imagen del producto */}
             <div className="flex items-center justify-center w-full sm:w-1/2">
-              <Link to={`/product/${currentProduct.id}`} className="relative w-full h-full rounded-xl overflow-hidden bg-slate-800 group object-cover cursor-pointer">
+              <Link to="/products?discount=true" className="relative w-full h-full rounded-xl overflow-hidden bg-slate-800 group object-cover cursor-pointer">
                 <img
                   src={currentProduct.image_url || 'https://via.placeholder.com/400x400?text=Sin+Imagen'}
                   alt={currentProduct.name}
