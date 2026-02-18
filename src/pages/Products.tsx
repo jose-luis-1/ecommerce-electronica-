@@ -1,4 +1,4 @@
-import { useState, useEffect,} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase, type Product } from '../services/supabase';
 import { Loading } from '../components/common/Loading';
@@ -17,6 +17,8 @@ export const Products = () => {
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
   const { addToCart } = useCart();
   const showOnlyDiscounts = searchParams.get('discount') === 'true';
+  const featuredProductId = searchParams.get('featured');
+  const productRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // --- CARGA DE DATOS DESDE SUPABASE ---
   useEffect(() => {
@@ -39,8 +41,6 @@ export const Products = () => {
 
     fetchProducts();
   }, []);
-
-
 
   const handleAddToCart = (product: Product) => {
     addToCart(product);
@@ -67,6 +67,18 @@ export const Products = () => {
     const matchesDiscount = !showOnlyDiscounts || (product.discount && product.discount > 0);
     return matchesCategory && matchesSearch && matchesDiscount;
   });
+
+  // --- SCROLL AUTOMÁTICO AL PRODUCTO DESTACADO ---
+  useEffect(() => {
+    if (featuredProductId && productRefs.current[featuredProductId]) {
+      setTimeout(() => {
+        productRefs.current[featuredProductId]?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 300);
+    }
+  }, [featuredProductId]);
 
   if (loading) return <Loading fullScreen />;
 
@@ -170,7 +182,17 @@ export const Products = () => {
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {filteredProducts.map(product => (
-                  <div key={product.id} className="group bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 flex flex-col shadow-xl">
+                  <div 
+                    key={product.id} 
+                    ref={(el) => {
+                      if (el) productRefs.current[product.id] = el;
+                    }}
+                    className={`group bg-slate-900 border rounded-2xl overflow-hidden transition-all duration-300 flex flex-col shadow-xl ${
+                      featuredProductId === product.id
+                        ? 'border-yellow-400 shadow-lg shadow-yellow-500/30'
+                        : 'border-slate-800 hover:border-blue-500/50 shadow-xl'
+                    }`}
+                  >
                     <div className="relative overflow-hidden bg-slate-800">
                       <img
                         src={product.image_url || 'https://via.placeholder.com/400x400?text=Sin+Imagen'}
