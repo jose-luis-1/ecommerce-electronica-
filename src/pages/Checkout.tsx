@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
-import { createOrder, sendWhatsAppOrder } from '../services/orderService';
-import { Input } from '../components/common/Input';
-import { Button } from '../components/common/Button';
-import { ArrowLeft, CheckCircle, Loader } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { createOrder, generateWhatsAppMessage } from "../services/orderService"; // ✅ cambiado
+import { Input } from "../components/common/Input";
+import { Button } from "../components/common/Button";
+import { ArrowLeft, CheckCircle, Loader } from "lucide-react";
 
 const SHIPPING_COST = 15000;
-const WHATSAPP_PHONE = '573014610269';
+const WHATSAPP_PHONE = "573014610269";
 
 export const Checkout = () => {
   const { cartItems, cartTotal, clearCart } = useCart();
@@ -16,85 +16,70 @@ export const Checkout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
-  const [orderId, setOrderId] = useState('');
+  const [orderId, setOrderId] = useState("");
+  const [whatsappUrl, setWhatsappUrl] = useState(""); // ✅ nuevo estado
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '', 
-    phone: '',
-    address: '',
-    city: '',
-    notes: '',
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    notes: "",
   });
 
   const [errors, setErrors] = useState({
-    name: '',
-    email: '', // ✅ Agregado
-    phone: '',
-    address: '',
-    city: '',
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
   });
 
   const shipping = cartTotal > 100000 ? 0 : SHIPPING_COST;
   const total = cartTotal + shipping;
 
-  // Redirigir si el carrito está vacío
   if (cartItems.length === 0 && !orderSuccess) {
-    navigate('/cart');
+    navigate("/cart");
     return null;
   }
 
   const validateForm = (): boolean => {
-    const newErrors = {
-      name: '',
-      email: '', 
-      phone: '',
-      address: '',
-      city: '',
-    };
+    const newErrors = { name: "", email: "", phone: "", address: "", city: "" };
 
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es requerido';
+      newErrors.name = "El nombre es requerido";
     }
-
-    // ✅ NUEVO: Validar email
     if (!formData.email.trim()) {
-      newErrors.email = 'El email es requerido';
+      newErrors.email = "El email es requerido";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Ingresa un email válido';
+      newErrors.email = "Ingresa un email válido";
     }
-
     if (!formData.phone.trim()) {
-      newErrors.phone = 'El teléfono es requerido';
-    } else if (!/^\d{10}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Ingresa un teléfono válido de 10 dígitos';
+      newErrors.phone = "El teléfono es requerido";
+    } else if (!/^\d{10}$/.test(formData.phone.replace(/\s/g, ""))) {
+      newErrors.phone = "Ingresa un teléfono válido de 10 dígitos";
     }
-
     if (!formData.address.trim()) {
-      newErrors.address = 'La dirección es requerida';
+      newErrors.address = "La dirección es requerida";
     }
-
     if (!formData.city.trim()) {
-      newErrors.city = 'La ciudad es requerida';
+      newErrors.city = "La ciudad es requerida";
     }
 
     setErrors(newErrors);
-    return !Object.values(newErrors).some((error) => error !== '');
+    return !Object.values(newErrors).some((error) => error !== "");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
 
     try {
-      // ✅ MODIFICADO: Pasar userId como opcional y agregar email + customerInfo
       const result = await createOrder(
-        user?.id || null, // null si no está logueado
+        user?.id || null,
         cartItems.map((item) => ({
           id: item.id,
           name: item.name,
@@ -102,27 +87,22 @@ export const Checkout = () => {
           quantity: item.quantity,
         })),
         total,
-        formData.email, // ✅ NUEVO: email
+        formData.email,
         {
-          // ✅ NUEVO: información del cliente
           name: formData.name,
           phone: formData.phone,
           address: formData.address,
           city: formData.city,
           notes: formData.notes,
-        }
+        },
       );
 
       if (!result.success || !result.orderId) {
-        throw new Error(result.error || 'Error al crear la orden');
+        throw new Error(result.error || "Error al crear la orden");
       }
 
-      setOrderId(result.orderId);
-      setOrderSuccess(true);
-
-      // Enviar a WhatsApp
-      sendWhatsAppOrder(
-        WHATSAPP_PHONE,
+      // ✅ Construir URL de WhatsApp y guardarla — NO usar window.open()
+      const message = generateWhatsAppMessage(
         result.orderId,
         cartItems.map((item) => ({
           id: item.id,
@@ -139,20 +119,24 @@ export const Checkout = () => {
           address: formData.address,
           city: formData.city,
           notes: formData.notes,
-        }
+        },
       );
 
-      // Limpiar carrito
+      setWhatsappUrl(
+        `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`,
+      );
+      setOrderId(result.orderId);
       clearCart();
+      setOrderSuccess(true);
     } catch (error: any) {
-      console.error('Error en checkout:', error);
-      alert('❌ Error al procesar la orden: ' + error.message);
+      console.error("Error en checkout:", error);
+      alert("❌ Error al procesar la orden: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Vista de éxito
+  // ✅ Vista de éxito con botón <a href> directo (nunca bloqueado en móvil)
   if (orderSuccess) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
@@ -162,17 +146,43 @@ export const Checkout = () => {
           </div>
           <h2 className="text-2xl font-bold text-white mb-3">¡Orden Creada!</h2>
           <p className="text-slate-400 mb-2">
-            Tu orden <span className="text-purple-400 font-mono">#{orderId.substring(0, 8)}</span> ha sido creada exitosamente.
+            Tu orden{" "}
+            <span className="text-purple-400 font-mono">
+              #{orderId.substring(0, 8)}
+            </span>{" "}
+            ha sido creada exitosamente.
           </p>
           <p className="text-slate-400 mb-6">
-            Se ha abierto WhatsApp para confirmar tu pedido. Si no se abrió automáticamente, contáctanos al{' '}
-            <span className="text-white font-semibold">{WHATSAPP_PHONE}</span>
+            Toca el botón verde para enviarnos tu pedido por WhatsApp y
+            coordinar el pago.
           </p>
+
           <div className="space-y-3">
-            <Button fullWidth onClick={() => navigate('/products')}>
+            {/* ✅ <a href> directo — el usuario lo toca, nunca bloqueado */}
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors text-base"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 fill-white flex-shrink-0"
+              >
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1
+                .653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.
+                57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 
+                2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884
+                 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057
+                  24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              Enviar pedido por WhatsApp
+            </a>
+
+            <Button fullWidth onClick={() => navigate("/products")}>
               Seguir Comprando
             </Button>
-            <Button fullWidth variant="secondary" onClick={() => navigate('/')}>
+            <Button fullWidth variant="secondary" onClick={() => navigate("/")}>
               Volver al Inicio
             </Button>
           </div>
@@ -184,10 +194,8 @@ export const Checkout = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* Header */}
         <button
-          onClick={() => navigate('/cart')}
+          onClick={() => navigate("/cart")}
           className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -197,28 +205,35 @@ export const Checkout = () => {
         <h1 className="text-3xl font-bold text-white mb-8">Finalizar Compra</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
           {/* Formulario */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6"
+            >
               <div>
-                <h2 className="text-xl font-bold text-white mb-4">Información de Entrega</h2>
-                
+                <h2 className="text-xl font-bold text-white mb-4">
+                  Información de Entrega
+                </h2>
+
                 <div className="space-y-4">
                   <Input
                     label="Nombre Completo *"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder="Juan Pérez"
                     error={errors.name}
                   />
 
-                  {/* ✅ NUEVO: Campo de email */}
                   <Input
                     label="Email *"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     placeholder="tu@email.com"
                     error={errors.email}
                   />
@@ -227,7 +242,9 @@ export const Checkout = () => {
                     label="Teléfono *"
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
                     placeholder="3001234567"
                     error={errors.phone}
                   />
@@ -235,7 +252,9 @@ export const Checkout = () => {
                   <Input
                     label="Dirección de Entrega *"
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
                     placeholder="Calle 123 #45-67"
                     error={errors.address}
                   />
@@ -243,7 +262,9 @@ export const Checkout = () => {
                   <Input
                     label="Ciudad *"
                     value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
                     placeholder="Medellín"
                     error={errors.city}
                   />
@@ -254,7 +275,9 @@ export const Checkout = () => {
                     </label>
                     <textarea
                       value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, notes: e.target.value })
+                      }
                       placeholder="Ej: Entregar en la portería, etc."
                       className="w-full px-4 py-2 bg-white text-slate-900 border border-slate-700 rounded-lg outline-none transition-all focus:ring-2 focus:ring-blue-500 resize-none placeholder-slate-500"
                       rows={3}
@@ -275,7 +298,7 @@ export const Checkout = () => {
                     Procesando...
                   </>
                 ) : (
-                  'Confirmar Pedido por WhatsApp'
+                  "Confirmar Pedido por WhatsApp"
                 )}
               </Button>
             </form>
@@ -284,9 +307,10 @@ export const Checkout = () => {
           {/* Resumen */}
           <div className="lg:col-span-1">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-white mb-6">Resumen del Pedido</h2>
+              <h2 className="text-xl font-bold text-white mb-6">
+                Resumen del Pedido
+              </h2>
 
-              {/* Productos */}
               <div className="space-y-3 mb-6">
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
@@ -294,36 +318,46 @@ export const Checkout = () => {
                       {item.name} x{item.quantity}
                     </span>
                     <span className="text-white font-semibold">
-                      ${new Intl.NumberFormat('es-CO').format(item.price * item.quantity)}
+                      $
+                      {new Intl.NumberFormat("es-CO").format(
+                        item.price * item.quantity,
+                      )}
                     </span>
                   </div>
                 ))}
               </div>
 
-              {/* Totales */}
               <div className="border-t border-slate-800 pt-4 space-y-3">
                 <div className="flex justify-between text-slate-400">
                   <span>Subtotal:</span>
-                  <span>${new Intl.NumberFormat('es-CO').format(cartTotal)}</span>
+                  <span>
+                    ${new Intl.NumberFormat("es-CO").format(cartTotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-slate-400">
                   <span>Envío:</span>
-                  <span className={shipping === 0 ? 'text-green-400 font-semibold' : ''}>
-                    {shipping === 0 ? 'Gratis ✓' : `$${new Intl.NumberFormat('es-CO').format(shipping)}`}
+                  <span
+                    className={
+                      shipping === 0 ? "text-green-400 font-semibold" : ""
+                    }
+                  >
+                    {shipping === 0
+                      ? "Gratis ✓"
+                      : `$${new Intl.NumberFormat("es-CO").format(shipping)}`}
                   </span>
                 </div>
                 <div className="border-t border-slate-800 pt-3 flex justify-between">
                   <span className="text-white font-bold text-lg">Total:</span>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 font-bold text-lg">
-                    ${new Intl.NumberFormat('es-CO').format(total)}
+                    ${new Intl.NumberFormat("es-CO").format(total)}
                   </span>
                 </div>
               </div>
 
-              {/* Info adicional */}
               <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
                 <p className="text-xs text-slate-400 text-center">
-                  Al confirmar, se abrirá WhatsApp para finalizar tu pedido. Nuestro equipo te contactará para coordinar el pago y envío.
+                  Al confirmar, se abrirá WhatsApp para finalizar tu pedido.
+                  Nuestro equipo te contactará para coordinar el pago y envío.
                 </p>
               </div>
             </div>

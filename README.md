@@ -7,17 +7,57 @@ Producción: Agrega aquí el enlace de tu despliegue (https://tu-dominio.com)
 
 ## 🚀 Características
 
+### 🏪 Catálogo y Productos
 - ✅ **Catálogo de productos** con filtros por categoría y búsqueda en tiempo real
+- ✅ **Filtro "Ofertas"** para mostrar solo productos con descuento
+- ✅ **Hero Carousel** con productos destacados que rota automáticamente cada 5 segundos
+- ✅ **Producto destacado** que aparece primero en el catálogo de ofertas al seleccionar desde el hero
+- ✅ **Precios con descuento** mostrando precio original, precio con descuento y monto ahorrado
+- ✅ **Stock visual** con indicador de cantidad disponible por color
+
+### 🛒 Carrito y Checkout
 - ✅ **Carrito de compras** con gestión de cantidades, eliminación de items y cálculo automático de totales
+- ✅ **Checkout avanzado** con validación de datos del cliente
+- ✅ **Integración WhatsApp** que envía automáticamente los detalles del pedido incluyendo datos del cliente
+- ✅ **Mensaje WhatsApp personalizado** con: productos, total, datos de envío y contacto del cliente
+
+### 🔐 Seguridad y Autenticación
 - ✅ **Sistema de autenticación** con Supabase (registro, login, logout)
 - ✅ **Panel de administración** para gestión de productos y usuarios
-- ✅ **Checkout y procesamiento de pedidos** con validación de formularios
-- ✅ **Diseño responsive y moderno** con Tailwind CSS
+- ✅ **Permisos de rol** (admin/user)
+
+### 📱 Experiencia de Usuario
+- ✅ **Diseño responsive y moderno** con Tailwind CSS optimizado para mobile
+- ✅ **Hero Carousel flexible** que se adapta al contenido en dispositivos móviles
+- ✅ **Scroll automático** al producto destacado en catálogo
+- ✅ **Borde destacado** (amarillo/glow) para producto seleccionado
+- ✅ **Navegación fluida** sin cambio de tamaño del hero
+
+### 🎯 Filtrado y Búsqueda
+- ✅ **Filtros por categoría** (Todos, Ofertas, Teléfonos, Audífonos, Relojes, Tablets, Monitores, Accesorios, Portátiles)
+- ✅ **Búsqueda en tiempo real** por nombre de producto
+- ✅ **Auto-selección de "Ofertas"** al llegar desde el hero
+- ✅ **Ordenamiento automático** con producto destacado primero
+
+### 💳 Gestión de Pedidos
+- ✅ **Creación automática de órdenes** en base de datos
+- ✅ **Actualización automática de stock** al procesar pedidos
+- ✅ **Detalles de orden** guardados con información del cliente
+- ✅ **Historial de órdenes** por usuario
+
+### 🎨 Diseño y UX
+- ✅ **Formato de precios** en pesos colombianos (COP)
+- ✅ **Emojis optimizados** para WhatsApp
+- ✅ **Tarjetas de producto mejoradas** con estructura flex clara
+- ✅ **Botón "Comprar"** posicionado al final de cada tarjeta
+- ✅ **Indicadores visuales** de descuento, categoría y stock
+
+### 🏗️ Gestión de Estado
 - ✅ **Gestión de estado** con Context API (Auth, Cart, Search, Admin)
 - ✅ **Formularios validados** con validadores personalizados
-- ✅ **Formato de precios** en pesos colombianos (COP)
 - ✅ **Navegación SPA** con React Router y página 404 personalizada
-- ✅ **Integración con Supabase** para base de datos y autenticación
+
+## 🆕 Nuevas Funcionalidades (Últimas Actualizaciones)
 
 ## 📁 Estructura del Proyecto
 
@@ -231,6 +271,14 @@ Producción: agrega aquí tu URL pública (por ejemplo, la URL que te da Vercel)
 - [x] Formularios validados
 - [x] Formato de precios en COP
 - [x] Navegación SPA con página 404
+- [x] **Hero Carousel con productos destacados**
+- [x] **Filtro "Ofertas" inteligente**
+- [x] **Integración WhatsApp con datos del cliente**
+- [x] **Producto destacado que aparece primero en ofertas**
+- [x] **Scroll automático al producto seleccionado**
+- [x] **Optimización responsiva para mobile**
+- [x] **Botones mejorados en tarjetas de producto**
+- [x] **Indicadores visuales de descuento y stock**
 
 ### 🔄 Pendiente
 - [ ] Página de detalle de producto individual
@@ -240,9 +288,131 @@ Producción: agrega aquí tu URL pública (por ejemplo, la URL que te da Vercel)
 - [ ] Notificaciones push
 - [ ] Integración con APIs de envío
 
+## 🎯 Descripción de Nuevas Funcionalidades
+
+### 1. Hero Carousel Dinámico (`src/components/common/HeroCarousel.tsx`)
+- **Carrusel automático** que rota productos con descuento cada 5 segundos
+- **Altura flexible en mobile** para mejor visualización de datos
+- **Controles de navegación**: botones prev/next e indicadores de puntos
+- **Producto actual destacado** con información completa (nombre, descripción, precio, stock)
+- **Dos botones de acción**:
+  - Imagen clickeable → Lleva a ofertas con producto destacado
+  - "Ver Oferta Completa" → Mismo destino con featured product
+
+### 2. Filtro "Ofertas" Inteligente (`src/pages/Products.tsx`)
+```tsx
+// Filtrado lógico:
+if (selectedCategory === 'Ofertas') {
+  matchesCategory = (product.discount ?? 0) > 0;
+}
+```
+- Categoría especial que filtra automáticamente productos con `discount > 0`
+- Visualmente diferenciada con color naranja y emoji 🔥
+- Auto-selecciona cuando llega desde el hero
+
+### 3. Ordenamiento de Productos por Destacado
+```tsx
+const orderedProducts = (featuredProductId && selectedCategory === 'Ofertas')
+  ? [
+      ...filteredProducts.filter(p => p.id === featuredProductId),
+      ...filteredProducts.filter(p => p.id !== featuredProductId)
+    ]
+  : filteredProducts;
+```
+- Producto destacado aparece **PRIMERO** en el grid
+- Borde amarillo con sombra (glow) para destacar visualmente
+- Solo aplica en categoría "Ofertas"
+
+### 4. Integración WhatsApp Mejorada (`src/services/orderService.ts`)
+```typescript
+sendWhatsAppOrder(
+  WHATSAPP_PHONE,     // Tu número
+  orderId,            // ID de la orden
+  cartItems,          // Productos
+  total,              // Subtotal
+  shipping,           // Envío
+  customerInfo        // ← NUEVO: Datos del cliente
+)
+```
+
+**Datos enviados en el mensaje:**
+```
+🛒 NUEVA ORDEN - TECHSTORE
+📋 Orden: ABC12345
+📅 Fecha: 18/02/2026
+
+PRODUCTOS:
+• Producto x1 - $10.000
+
+💰 Subtotal: $10.000
+🚚 Envio: $0
+💳 Total: $10.000
+
+👤 DATOS DEL CLIENTE:
+- Nombre: Juan Pérez
+- Email: juan@example.com
+- Telefono: 3001234567
+- Direccion: Calle Principal 123
+- Ciudad: Bogotá
+- Notas: Entregar después de las 5pm
+```
+
+### 5. Tarjetas de Producto Mejoradas (`src/components/product/ProductCard.tsx`)
+- Estructura clara con imagen arriba y contenido abajo
+- Botón "Comprar/Agotado" al final con `mt-auto`
+- Sin posicionamiento absoluto que cause solapamiento
+- Responsive: tamaños adaptativos para mobile y desktop
+- Indicadores: descuento y categoría como badges
+
+### 6. Optimización Mobile en Hero (`src/components/common/HeroCarousel.tsx`)
+```tailwind
+/* Mobile first */
+text-xl sm:text-4xl          /* Nombre */
+text-xs sm:text-base         /* Descripción */
+p-3 sm:p-6                   /* Padding */
+gap-2 sm:gap-3               /* Espacios */
+h-auto sm:h-96               /* Altura flexible */
+```
+
+### 7. Scroll Automático al Producto (`src/pages/Products.tsx`)
+```typescript
+useEffect(() => {
+  if (featuredProductId && productRefs.current[featuredProductId]) {
+    setTimeout(() => {
+      productRefs.current[featuredProductId]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 300);
+  }
+}, [featuredProductId]);
+```
+
+## 🔧 Configuración de WhatsApp
+
+### Cambiar número de WhatsApp
+En `src/pages/Checkout.tsx`:
+```typescript
+const WHATSAPP_PHONE = '573014610269'; // ← Reemplaza con tu número en formato internacional
+```
+
+### Formato del número:
+- **Formato internacional**: código país + número sin símbolos
+- **Ejemplo Colombia**: `573001234567` (57 = código país, 3001234567 = número)
+- **Formato**: `+57 (300) 1234567` → `573001234567`
+
+### Personalizar mensaje de WhatsApp
+Edita `src/services/orderService.ts` en la función `generateWhatsAppMessage()`:
+```typescript
+const message = `
+🛒 *NUEVA ORDEN - TECHSTORE*
+... (aquí personaliza el mensaje)
+`;
+```
+
 ## 👨‍💻 Autor
 
-Proyecto de aprendizaje de React.
+Proyecto de e-commerce con React, TypeScript y Supabase.
 
 ## 📄 Licencia
 
