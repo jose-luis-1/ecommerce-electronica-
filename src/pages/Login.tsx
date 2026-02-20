@@ -60,6 +60,7 @@ export const Login = () => {
   const handleSendRecoveryCode = async (e: FormEvent) => {
     e.preventDefault();
     setForgotError('');
+    console.log('Send recovery code clicked for:', forgotEmail);
 
     if (!validateEmail(forgotEmail)) {
       setForgotError('Por favor ingresa un email válido');
@@ -71,6 +72,7 @@ export const Login = () => {
     try {
       // Generar código de 4 dígitos
       const code = generateRecoveryCode();
+      console.log('Generated code:', code);
 
       // Guardar en Supabase
       const { error: insertError } = await supabase
@@ -85,15 +87,17 @@ export const Login = () => {
         ]);
 
       if (insertError) throw insertError;
+      console.log('Code saved to database');
 
       // Llamar a la Edge Function para enviar email
       try {
-        await supabase.functions.invoke('send-recovery-code', {
+        const response = await supabase.functions.invoke('send-recovery-code', {
           body: {
             email: forgotEmail,
             code: code,
           },
         });
+        console.log('Email function response:', response);
       } catch (emailError) {
         console.warn('Error al enviar email, pero el código fue guardado:', emailError);
       }
@@ -101,6 +105,7 @@ export const Login = () => {
       setForgotStep('code');
       setForgotError('');
     } catch (err: any) {
+      console.error('Error in handleSendRecoveryCode:', err);
       setForgotError(err.message || 'Error al enviar el código');
     } finally {
       setForgotLoading(false);
@@ -188,6 +193,7 @@ export const Login = () => {
   };
 
   const closeForgotPasswordModal = () => {
+    console.log('Closing forgot password modal');
     setShowForgotPassword(false);
     setForgotStep('email');
     setForgotEmail('');
@@ -286,7 +292,10 @@ export const Login = () => {
                   <label className="block text-sm font-medium text-slate-400">Contraseña</label>
                   <button
                     type="button"
-                    onClick={() => setShowForgotPassword(true)}
+                    onClick={() => {
+                      console.log('Forgot password button clicked');
+                      setShowForgotPassword(true);
+                    }}
                     className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors"
                   >
                     ¿Olvidaste tu contraseña?
@@ -330,26 +339,27 @@ export const Login = () => {
 
         {/* --- MODAL RECUPERACIÓN DE CONTRASEÑA --- */}
         {showForgotPassword && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl shadow-black/50 relative">
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+            <div className="bg-slate-900 border border-slate-700 rounded-2xl p-8 max-w-md w-full shadow-2xl relative animate-in fade-in zoom-in duration-200">
               {/* Botón Cerrar */}
               <button
+                type="button"
                 onClick={closeForgotPasswordModal}
                 className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
               >
                 <X className="h-6 w-6" />
               </button>
 
-              <h3 className="text-2xl font-bold text-white mb-6 pr-8">
+              <h2 className="text-2xl font-bold text-white mb-6 pr-8">
                 {forgotStep === 'email' && 'Recuperar Contraseña'}
                 {forgotStep === 'code' && 'Verificar Código'}
                 {forgotStep === 'newPassword' && 'Nueva Contraseña'}
-              </h3>
+              </h2>
 
               {/* Mensaje de Error */}
               {forgotError && (
-                <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm">
-                  {forgotError}
+                <div className="mb-4 bg-red-500/20 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg text-sm font-medium">
+                  ⚠️ {forgotError}
                 </div>
               )}
 
