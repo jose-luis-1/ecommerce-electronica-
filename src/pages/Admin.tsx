@@ -139,10 +139,18 @@ export const Admin = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Estás seguro?")) return;
+    const product = products.find((p) => p.id === id);
+    const isDeleted = product?.is_deleted || false;
+    const action = isDeleted ? "recuperar" : "eliminar";
+
+    if (!confirm(`¿Estás seguro de ${action} este producto?`)) return;
     try {
-      const { error } = await supabase.from("products").delete().eq("id", id);
+      const { error } = await supabase
+        .from("products")
+        .update({ is_deleted: !isDeleted })
+        .eq("id", id);
       if (error) throw error;
+      alert(`Producto ${action}do correctamente`);
       fetchProducts();
     } catch (error: any) {
       alert("Error: " + error.message);
@@ -316,17 +324,35 @@ export const Admin = () => {
                 .map((product) => (
                 <tr
                   key={product.id}
-                  className="hover:bg-slate-800/30 transition-colors"
+                  className={`hover:bg-slate-800/30 transition-colors ${
+                    product.is_deleted ? "opacity-50 bg-red-500/10" : ""
+                  }`}
                 >
                   <td className="px-6 py-4">
-                    <img
-                      src={product.image_url}
-                      alt=""
-                      className="w-12 h-12 object-cover rounded-lg"
-                    />
+                    <div className="relative">
+                      <img
+                        src={product.image_url}
+                        alt=""
+                        className={`w-12 h-12 object-cover rounded-lg ${
+                          product.is_deleted ? "opacity-50" : ""
+                        }`}
+                      />
+                      {product.is_deleted && (
+                        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-red-400">
+                          X
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-medium">{product.name}</div>
+                    <div className={`font-medium ${product.is_deleted ? "text-slate-500" : ""}`}>
+                      {product.name}
+                      {product.is_deleted && (
+                        <span className="ml-2 text-xs bg-red-500/30 text-red-400 px-2 py-1 rounded">
+                          Eliminado
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs text-slate-500">
                       {product.category}
                     </div>
@@ -351,9 +377,13 @@ export const Admin = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(product.id)}
-                        className="text-red-500 hover:text-white transition-colors"
+                        className={`transition-colors ${
+                          product.is_deleted
+                            ? "text-green-500 hover:text-white"
+                            : "text-red-500 hover:text-white"
+                        }`}
                       >
-                        Eliminar
+                        {product.is_deleted ? "Recuperar" : "Eliminar"}
                       </button>
                     </div>
                   </td>

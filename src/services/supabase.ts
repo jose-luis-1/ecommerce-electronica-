@@ -20,6 +20,7 @@ export interface Product {
   image_url: string;
   stock: number;
   discount?: number | null;
+  is_deleted?: boolean;
   created_at: string;
 }
 

@@ -16,6 +16,7 @@ export const HeroCarousel = () => {
         const { data, error } = await supabase
           .from('products')
           .select('*')
+          .eq('is_deleted', false)
           .gt('discount', 0) // Traer solo productos con descuento
           .order('discount', { ascending: false })
           .limit(5);
