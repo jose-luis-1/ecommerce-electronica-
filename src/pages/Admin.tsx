@@ -13,6 +13,7 @@ export const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -64,6 +65,7 @@ export const Admin = () => {
     });
     setEditingProduct(null);
     setShowForm(false);
+    setSearchTerm("");
   };
 
   const handleEdit = (product: Product) => {
@@ -79,6 +81,8 @@ export const Admin = () => {
       discount: product.discount?.toString() || "",
     });
     setShowForm(true);
+    // Scroll automático hacia arriba para mostrar el formulario
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -283,6 +287,16 @@ export const Admin = () => {
           </div>
         )}
 
+        {/* CAMPO DE BÚSQUEDA */}
+        <div className="mb-6">
+          <Input
+            label="Buscar Producto"
+            placeholder="Escribe el nombre del producto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
         <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-x-auto">
           <table className="w-full min-w-[800px]">
             <thead className="bg-slate-800/50">
@@ -305,7 +319,11 @@ export const Admin = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
-              {products.map((product) => (
+              {products
+                .filter((product) =>
+                  product.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((product) => (
                 <tr
                   key={product.id}
                   className="hover:bg-slate-800/30 transition-colors"
