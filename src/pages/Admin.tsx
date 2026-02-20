@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAdmin } from "../context/AdminContext";
+import { useSearch } from "../context/SearchContext";
 import { useNavigate } from "react-router-dom";
 import { supabase, type Product } from "../services/supabase";
 import { Button } from "../components/common/Button";
@@ -8,12 +9,12 @@ import { Loading } from "../components/common/Loading";
 
 export const Admin = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
+  const { searchTerm } = useSearch();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -65,7 +66,6 @@ export const Admin = () => {
     });
     setEditingProduct(null);
     setShowForm(false);
-    setSearchTerm("");
   };
 
   const handleEdit = (product: Product) => {
@@ -286,16 +286,6 @@ export const Admin = () => {
             </form>
           </div>
         )}
-
-        {/* CAMPO DE BÚSQUEDA */}
-        <div className="mb-6">
-          <Input
-            label="Buscar Producto"
-            placeholder="Escribe el nombre del producto..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
 
         <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-x-auto">
           <table className="w-full min-w-[800px]">
