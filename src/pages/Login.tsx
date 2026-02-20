@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { validateEmail } from '../utils/validators';
 // Usamos iconos de Lucide para dar contexto visual
-import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff, ShieldCheck, X } from 'lucide-react';
+import { supabase } from '../services/supabase';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +12,17 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState(false); // Estado para ver contraseña
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Estados para recuperación de contraseña
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState<'email' | 'code' | 'newPassword'>('email');
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [recoveryCode, setRecoveryCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [forgotError, setForgotError] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -39,6 +51,150 @@ export const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateRecoveryCode = () => {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+  };
+
+  const handleSendRecoveryCode = async (e: FormEvent) => {
+    e.preventDefault();
+    setForgotError('');
+
+    if (!validateEmail(forgotEmail)) {
+      setForgotError('Por favor ingresa un email válido');
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      // Generar código de 4 dígitos
+      const code = generateRecoveryCode();
+
+      // Guardar en Supabase
+      const { error: insertError } = await supabase
+        .from('password_recovery_codes')
+        .insert([
+          {
+            email: forgotEmail,
+            code: code,
+            created_at: new Date().toISOString(),
+            expires_at: new Date(Date.now() + 10 * 60000).toISOString(), // 10 minutos
+          },
+        ]);
+
+      if (insertError) throw insertError;
+
+      // Llamar a la Edge Function para enviar email
+      try {
+        await supabase.functions.invoke('send-recovery-code', {
+          body: {
+            email: forgotEmail,
+            code: code,
+          },
+        });
+      } catch (emailError) {
+        console.warn('Error al enviar email, pero el código fue guardado:', emailError);
+      }
+
+      setForgotStep('code');
+      setForgotError('');
+    } catch (err: any) {
+      setForgotError(err.message || 'Error al enviar el código');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: FormEvent) => {
+    e.preventDefault();
+    setForgotError('');
+
+    if (recoveryCode.length !== 4) {
+      setForgotError('El código debe tener 4 dígitos');
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      // Verificar código en Supabase
+      const { data, error } = await supabase
+        .from('password_recovery_codes')
+        .select('*')
+        .eq('email', forgotEmail)
+        .eq('code', recoveryCode)
+        .eq('used', false)
+        .gt('expires_at', new Date().toISOString())
+        .single();
+
+      if (error || !data) {
+        throw new Error('Código inválido o expirado');
+      }
+
+      setForgotStep('newPassword');
+      setForgotError('');
+    } catch (err: any) {
+      setForgotError(err.message || 'Código inválido');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: FormEvent) => {
+    e.preventDefault();
+    setForgotError('');
+
+    if (newPassword.length < 6) {
+      setForgotError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setForgotError('Las contraseñas no coinciden');
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      // Invocar Edge Function para cambiar la contraseña
+      const { data, error: resetError } = await supabase.functions.invoke('reset-password', {
+        body: {
+          email: forgotEmail,
+          code: recoveryCode,
+          newPassword: newPassword,
+        },
+      });
+
+      if (resetError || !data?.success) {
+        throw new Error(data?.error || 'Error al cambiar la contraseña');
+      }
+
+      alert('Contraseña actualizada correctamente');
+      setShowForgotPassword(false);
+      setForgotStep('email');
+      setForgotEmail('');
+      setRecoveryCode('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      console.error('Error:', err);
+      setForgotError(err.message || 'Error al cambiar la contraseña. Por favor intenta de nuevo.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const closeForgotPasswordModal = () => {
+    setShowForgotPassword(false);
+    setForgotStep('email');
+    setForgotEmail('');
+    setRecoveryCode('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setForgotError('');
   };
 
   return (
@@ -128,9 +284,13 @@ export const Login = () => {
 
             <div className="flex justify-between items-center mb-1.5 ml-1">
                   <label className="block text-sm font-medium text-slate-400">Contraseña</label>
-                  <a href="#" className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors"
+                  >
                     ¿Olvidaste tu contraseña?
-                  </a>
+                  </button>
                 </div>
 
             {/* Botón Submit con Estado de Carga */}
@@ -167,6 +327,173 @@ export const Login = () => {
           </div>
           
         </div>
+
+        {/* --- MODAL RECUPERACIÓN DE CONTRASEÑA --- */}
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl shadow-black/50 relative">
+              {/* Botón Cerrar */}
+              <button
+                onClick={closeForgotPasswordModal}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+
+              <h3 className="text-2xl font-bold text-white mb-6 pr-8">
+                {forgotStep === 'email' && 'Recuperar Contraseña'}
+                {forgotStep === 'code' && 'Verificar Código'}
+                {forgotStep === 'newPassword' && 'Nueva Contraseña'}
+              </h3>
+
+              {/* Mensaje de Error */}
+              {forgotError && (
+                <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm">
+                  {forgotError}
+                </div>
+              )}
+
+              {/* PASO 1: EMAIL */}
+              {forgotStep === 'email' && (
+                <form onSubmit={handleSendRecoveryCode} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="tu@email.com"
+                      className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all"
+                      required
+                    />
+                    <p className="text-xs text-slate-400 mt-2">
+                      Te enviaremos un código de 4 dígitos a este correo
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {forgotLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Enviando...
+                      </>
+                    ) : (
+                      'Enviar Código'
+                    )}
+                  </button>
+                </form>
+              )}
+
+              {/* PASO 2: CÓDIGO */}
+              {forgotStep === 'code' && (
+                <form onSubmit={handleVerifyCode} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Código de 4 dígitos
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={4}
+                      value={recoveryCode}
+                      onChange={(e) => setRecoveryCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="0000"
+                      className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all text-center text-2xl font-mono letter-spacing-2"
+                      required
+                    />
+                    <p className="text-xs text-slate-400 mt-2">
+                      Revisa tu correo (puede estar en spam)
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={forgotLoading || recoveryCode.length !== 4}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {forgotLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Verificando...
+                      </>
+                    ) : (
+                      'Verificar Código'
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForgotStep('email')}
+                    className="w-full py-2 text-slate-400 hover:text-slate-300 text-sm transition-colors"
+                  >
+                    Volver
+                  </button>
+                </form>
+              )}
+
+              {/* PASO 3: NUEVA CONTRASEÑA */}
+              {forgotStep === 'newPassword' && (
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Nueva Contraseña
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
+                      >
+                        {showNewPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Confirmar Contraseña
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-4 py-3 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {forgotLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Cambiando...
+                      </>
+                    ) : (
+                      'Cambiar Contraseña'
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
