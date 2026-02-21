@@ -15,10 +15,11 @@ export const ProductDetailProvider = ({ children }: { children: ReactNode }) => 
   const [isOpen, setIsOpen] = useState(false);
 
   const openModal = (product: Product) => {
-    console.log('openModal llamado:', product.name);
-    setIsOpen(true);
-    document.body.style.overflow = 'hidden';
-  };
+  console.log('openModal llamado:', product.name);
+  setSelectedProduct(product);
+  setIsOpen(true);
+  document.body.style.overflow = 'hidden';
+};
 
   const closeModal = () => {
     setIsOpen(false);

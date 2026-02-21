@@ -1,18 +1,20 @@
 import { useEffect } from 'react';
 import { X, ShoppingCart, Star, Truck, RotateCw } from 'lucide-react';
-import type { Product } from '../../services/supabase';
 import { formatPrice } from '../../utils/formatPrice';
 import { useCart } from '../../context/CartContext';
 import { useProductDetail } from '../../context/ProductDetailContext';
 
-interface ProductDetailModalProps {
-  product: Product | null;
-}
-
-export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
-  const { closeModal, isOpen } = useProductDetail();
+export const ProductDetailModal = () => {
+  // ✅ Ahora obtenemos el producto desde el context
+  const { closeModal, isOpen, selectedProduct } = useProductDetail();
   const { addToCart } = useCart();
-  console.log('Modal state → isOpen:', isOpen, '| product:', product?.name);
+
+  console.log(
+    'Modal state → isOpen:',
+    isOpen,
+    '| product:',
+    selectedProduct?.name
+  );
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -25,13 +27,17 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
     }
   }, [isOpen, closeModal]);
 
-  if (!isOpen || !product) return null;
+  // ✅ Validamos contra selectedProduct
+  if (!isOpen || !selectedProduct) return null;
 
-  const discountedPrice = product.discount 
+  // ✅ Alias para no cambiar todo el JSX
+  const product = selectedProduct;
+
+  const discountedPrice = product.discount
     ? product.price * (1 - product.discount / 100)
     : product.price;
 
-  const savingsAmount = product.discount 
+  const savingsAmount = product.discount
     ? Math.round(product.price - discountedPrice)
     : 0;
 
@@ -55,7 +61,7 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
           className="bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-800 max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* HEADER CON BOTÓN CERRAR */}
+          {/* HEADER */}
           <div className="sticky top-0 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 sm:px-6 py-4 flex items-center justify-between z-10">
             <h2 className="text-lg sm:text-xl font-bold text-white truncate">
               Detalles del Producto
@@ -71,13 +77,15 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
 
           {/* CONTENIDO */}
           <div className="p-4 sm:p-6">
-            {/* Grid responsive: imagen a la izquierda en desktop, arriba en móvil */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               
               {/* IMAGEN */}
               <div className="flex items-center justify-center bg-slate-800 rounded-xl overflow-hidden h-80">
                 <img
-                  src={product.image_url || 'https://via.placeholder.com/400x400?text=Producto'}
+                  src={
+                    product.image_url ||
+                    'https://via.placeholder.com/400x400?text=Producto'
+                  }
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
@@ -98,18 +106,19 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
                         className="w-4 h-4 fill-yellow-400 text-yellow-400"
                       />
                     ))}
-                    <span className="text-xs text-slate-400 ml-1">(234 reseñas)</span>
+                    <span className="text-xs text-slate-400 ml-1">
+                      (234 reseñas)
+                    </span>
                   </div>
                 </div>
 
-                {/* TÍTULO */}
                 <h1 className="text-2xl sm:text-3xl font-bold text-white">
                   {product.name}
                 </h1>
 
-                {/* DESCRIPCIÓN */}
                 <p className="text-slate-300 text-sm leading-relaxed">
-                  {product.description || 'Producto de alta calidad con los mejores materiales del mercado.'}
+                  {product.description ||
+                    'Producto de alta calidad con los mejores materiales del mercado.'}
                 </p>
 
                 {/* PRECIOS */}
@@ -128,7 +137,8 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
                         {formatPrice(discountedPrice)}
                       </div>
                       <div className="text-sm text-green-400 font-semibold">
-                        ✓ Ahorras: ${savingsAmount.toLocaleString('es-CO')}
+                        ✓ Ahorras: $
+                        {savingsAmount.toLocaleString('es-CO')}
                       </div>
                     </div>
                   ) : (
@@ -147,7 +157,7 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
                       </p>
                       {product.stock <= 5 && (
                         <p className="text-xs text-orange-400 font-semibold">
-                          ⚠️ ¡Solo quedan {product.stock} unidades! Apúrate antes de que se agoten.
+                          ⚠️ ¡Solo quedan {product.stock} unidades!
                         </p>
                       )}
                     </div>
@@ -162,15 +172,19 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
                 <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <Truck className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                    <span className="text-slate-300">Envío gratis en compras superiores a $50</span>
+                    <span className="text-slate-300">
+                      Envío gratis en compras superiores a $50
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <RotateCw className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                    <span className="text-slate-300">Devolución sin costo dentro de 30 días</span>
+                    <span className="text-slate-300">
+                      Devolución sin costo dentro de 30 días
+                    </span>
                   </div>
                 </div>
 
-                {/* BOTÓN AGREGAR AL CARRITO */}
+                {/* BOTÓN */}
                 <button
                   onClick={handleAddToCart}
                   disabled={product.stock <= 0}
@@ -184,7 +198,6 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
                   {product.stock <= 0 ? 'Agotado' : 'Agregar al Carrito'}
                 </button>
 
-                {/* BOTÓN CERRAR MÓVIL */}
                 <button
                   onClick={closeModal}
                   className="w-full py-2 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-colors md:hidden"
@@ -194,9 +207,11 @@ export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
               </div>
             </div>
 
-            {/* DETALLES ADICIONALES */}
+            {/* ESPECIFICACIONES */}
             <div className="border-t border-slate-700 pt-6">
-              <h3 className="text-lg font-bold text-white mb-4">Especificaciones</h3>
+              <h3 className="text-lg font-bold text-white mb-4">
+                Especificaciones
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-slate-800/50 p-4 rounded-lg">
                   <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">
