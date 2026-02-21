@@ -1,8 +1,8 @@
 import type { MouseEvent } from 'react';
-import { Link } from 'react-router-dom';
 import type { Product } from '../../services/supabase';
 import { formatPrice } from '../../utils/formatPrice';
 import { useCart } from '../../context/CartContext';
+import { useProductDetail } from '../../context/ProductDetailContext';
 
 interface ProductCardProps {
   product: Product;
@@ -10,14 +10,19 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { openModal } = useProductDetail();
 
   const handleAddToCart = (e: MouseEvent) => {
     e.preventDefault();
     addToCart(product);
   };
 
+  const handleOpenModal = () => {
+    openModal(product);
+  };
+
   return (
-    <Link to={`/product/${product.id}`} className="group">
+    <div className="group cursor-pointer" onClick={handleOpenModal}>
       <div className="flex flex-col h-full bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 shadow-xl">
         
         {/* BLOQUE 1: Solo imagen con badges */}
@@ -88,7 +93,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           
           {/* Botón al final */}
           <button
-            onClick={handleAddToCart}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCart(e);
+            }}
             disabled={product.stock <= 0}
             className={`mt-auto w-full px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
               product.stock <= 0
@@ -100,6 +108,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
