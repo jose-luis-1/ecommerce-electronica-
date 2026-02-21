@@ -15,15 +15,18 @@ export const ProductDetailProvider = ({ children }: { children: ReactNode }) => 
   const [isOpen, setIsOpen] = useState(false);
 
   const openModal = (product: Product) => {
-  console.log('openModal llamado:', product.name);
-  setSelectedProduct(product);
-  setIsOpen(true);
-  document.body.style.overflow = 'hidden';
-};
+    // Log para verificar en consola que el click funciona y trae los datos
+    console.log('🚀 openModal activado para:', product.name);
+    setSelectedProduct(product); 
+    setIsOpen(true);
+    // Evitamos el scroll del fondo al abrir el modal
+    document.body.style.overflow = 'hidden';
+  };
 
   const closeModal = () => {
     setIsOpen(false);
     setSelectedProduct(null);
+    // Restauramos el scroll al cerrar
     document.body.style.overflow = 'unset';
   };
 

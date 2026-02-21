@@ -5,7 +5,6 @@ import { useCart } from '../../context/CartContext';
 import { useProductDetail } from '../../context/ProductDetailContext';
 
 export const ProductDetailModal = () => {
-  // ✅ Ahora obtenemos el producto desde el context
   const { closeModal, isOpen, selectedProduct } = useProductDetail();
   const { addToCart } = useCart();
 
@@ -27,10 +26,8 @@ export const ProductDetailModal = () => {
     }
   }, [isOpen, closeModal]);
 
-  // ✅ Validamos contra selectedProduct
   if (!isOpen || !selectedProduct) return null;
 
-  // ✅ Alias para no cambiar todo el JSX
   const product = selectedProduct;
 
   const discountedPrice = product.discount
@@ -48,17 +45,19 @@ export const ProductDetailModal = () => {
 
   return (
     <>
-      {/* OVERLAY */}
+      {/* OVERLAY: z-50 — queda debajo del modal */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300"
         onClick={closeModal}
         aria-hidden="true"
       />
 
-      {/* MODAL */}
-      <div className="fixed inset-0 z-50 overflow-auto flex items-center justify-center p-4">
+      {/* ✅ FIX: z-[60] > z-50 del overlay | pointer-events-none en el wrapper */}
+      <div className="fixed inset-0 z-[60] overflow-auto flex items-center justify-center p-4 pointer-events-none">
+        
+        {/* ✅ pointer-events-auto solo en el contenido del modal */}
         <div
-          className="bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-800 max-h-[90vh] overflow-y-auto"
+          className="bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-800 max-h-[90vh] overflow-y-auto pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* HEADER */}
@@ -78,7 +77,7 @@ export const ProductDetailModal = () => {
           {/* CONTENIDO */}
           <div className="p-4 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              
+
               {/* IMAGEN */}
               <div className="flex items-center justify-center bg-slate-800 rounded-xl overflow-hidden h-80">
                 <img
@@ -93,7 +92,7 @@ export const ProductDetailModal = () => {
 
               {/* INFORMACIÓN */}
               <div className="flex flex-col gap-4">
-                
+
                 {/* CATEGORÍA Y RATING */}
                 <div className="flex items-center gap-3">
                   <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border border-blue-500/30">
@@ -184,7 +183,7 @@ export const ProductDetailModal = () => {
                   </div>
                 </div>
 
-                {/* BOTÓN */}
+                {/* BOTÓN AGREGAR */}
                 <button
                   onClick={handleAddToCart}
                   disabled={product.stock <= 0}
@@ -198,6 +197,7 @@ export const ProductDetailModal = () => {
                   {product.stock <= 0 ? 'Agotado' : 'Agregar al Carrito'}
                 </button>
 
+                {/* BOTÓN CERRAR (solo mobile) */}
                 <button
                   onClick={closeModal}
                   className="w-full py-2 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-colors md:hidden"
