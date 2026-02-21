@@ -5,6 +5,7 @@ interface ProductDetailContextType {
   selectedProduct: Product | null;
   isOpen: boolean;
   openModal: (product: Product) => void;
+  openProduct: (product: Product) => void; // ✅ alias para compatibilidad con el Modal
   closeModal: () => void;
 }
 
@@ -15,23 +16,26 @@ export const ProductDetailProvider = ({ children }: { children: ReactNode }) => 
   const [isOpen, setIsOpen] = useState(false);
 
   const openModal = (product: Product) => {
-    // Log para verificar en consola que el click funciona y trae los datos
     console.log('🚀 openModal activado para:', product.name);
-    setSelectedProduct(product); 
+    setSelectedProduct(product);
     setIsOpen(true);
-    // Evitamos el scroll del fondo al abrir el modal
     document.body.style.overflow = 'hidden';
   };
 
   const closeModal = () => {
     setIsOpen(false);
     setSelectedProduct(null);
-    // Restauramos el scroll al cerrar
     document.body.style.overflow = 'unset';
   };
 
   return (
-    <ProductDetailContext.Provider value={{ selectedProduct, isOpen, openModal, closeModal }}>
+    <ProductDetailContext.Provider value={{
+      selectedProduct,
+      isOpen,
+      openModal,
+      openProduct: openModal, // ✅ mismo función, dos nombres
+      closeModal,
+    }}>
       {children}
     </ProductDetailContext.Provider>
   );
