@@ -12,6 +12,7 @@ interface ProductDetailModalProps {
 export const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
   const { closeModal, isOpen } = useProductDetail();
   const { addToCart } = useCart();
+  console.log('Modal state → isOpen:', isOpen, '| product:', product?.name);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
